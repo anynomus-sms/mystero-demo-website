@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MYSTERO — Detects the bad, grows the good.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #0a0f1e;
+    --bg2: #0f172a;
+    --bg3: #111827;
+    --blue: #3b82f6;
+    --blue-dim: #1d4ed8;
+    --blue-glow: rgba(59,130,246,0.35);
+    --magenta: #ec4899;
+    --magenta-dim: #be185d;
+    --magenta-glow: rgba(236,72,153,0.38);
+    --green: #10b981;
+    --green-dim: #065f46;
+    --green-glow: rgba(16,185,129,0.35);
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --text-dim: #475569;
+    --border: rgba(255,255,255,0.07);
+    --glass: rgba(15,23,42,0.65);
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── NOISE OVERLAY ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.4;
+  }
+
+  /* ─── ANIMATED BG ORBS ─── */
+  .orb-field {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.18;
+    animation: orbFloat 20s ease-in-out infinite;
+  }
+  .orb-1 { width: 700px; height: 700px; background: var(--blue); top: -200px; left: -200px; animation-duration: 22s; }
+  .orb-2 { width: 500px; height: 500px; background: var(--magenta); bottom: -150px; right: -100px; animation-duration: 18s; animation-delay: -8s; }
+  .orb-3 { width: 400px; height: 400px; background: var(--green); top: 40%; left: 40%; animation-duration: 25s; animation-delay: -4s; }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(40px, -60px) scale(1.05); }
+    66% { transform: translate(-30px, 40px) scale(0.95); }
+  }
+
+  /* ─── LAYOUT ─── */
+  .container {
+    max-width: 1160px;
+    margin: 0 auto;
+    padding: 0 24px;
+    position: relative;
+    z-index: 2;
+  }
+
+  section { position: relative; z-index: 2; }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 18px 0;
+    background: rgba(10,15,30,0.75);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    transition: all 0.3s ease;
+  }
+  nav .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    background: linear-gradient(135deg, var(--blue), var(--green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .nav-links {
+    display: flex;
+    gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--blue); }
+
+  .nav-burger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .nav-burger span {
+    display: block;
+    width: 24px;
+    height: 2px;
+    background: var(--text-muted);
+    border-radius: 2px;
+    transition: all 0.3s;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 120px 0 80px;
+  }
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--blue);
+    background: rgba(59,130,246,0.1);
+    border: 1px solid rgba(59,130,246,0.25);
+    padding: 6px 14px;
+    border-radius: 999px;
+    margin-bottom: 28px;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--blue);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 5.5vw, 5.5rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+  .hero h1 .line-blue {
+    background: linear-gradient(135deg, var(--blue) 0%, #60a5fa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero h1 .line-white { color: #f8fafc; }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+    margin-bottom: 40px;
+    max-width: 520px;
+  }
+  .hero-sub em {
+    color: var(--green);
+    font-style: normal;
+    font-weight: 500;
+  }
+  .hero-cta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--blue);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    box-shadow: 0 0 28px var(--blue-glow), 0 4px 16px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+  }
+  .btn-primary:hover {
+    background: #2563eb;
+    box-shadow: 0 0 48px var(--blue-glow), 0 8px 32px rgba(0,0,0,0.4);
+    transform: translateY(-2px);
+  }
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    transition: all 0.3s ease;
+  }
+  .btn-ghost:hover {
+    color: var(--text);
+    border-color: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.06);
+  }
+
+  /* hero visual */
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .myco-diagram {
+    position: relative;
+    width: 360px;
+    height: 360px;
+  }
+  .myco-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid;
+    animation: ringRotate 12s linear infinite;
+  }
+  .myco-ring:nth-child(1) {
+    inset: 0;
+    border-color: rgba(59,130,246,0.3);
+    animation-duration: 20s;
+  }
+  .myco-ring:nth-child(2) {
+    inset: 30px;
+    border-color: rgba(16,185,129,0.25);
+    animation-duration: 14s;
+    animation-direction: reverse;
+  }
+  .myco-ring:nth-child(3) {
+    inset: 60px;
+    border-color: rgba(236,72,153,0.2);
+    animation-duration: 10s;
+  }
+  @keyframes ringRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  .myco-core {
+    position: absolute;
+    inset: 90px;
+    background: radial-gradient(circle at 35% 35%, rgba(59,130,246,0.25), rgba(16,185,129,0.12), rgba(10,15,30,0.8));
+    border-radius: 50%;
+    border: 1px solid rgba(59,130,246,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 6px;
+    box-shadow: 0 0 60px rgba(59,130,246,0.2), inset 0 0 40px rgba(59,130,246,0.1);
+  }
+  .myco-core-label {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: var(--blue);
+    text-shadow: 0 0 20px var(--blue);
+  }
+  .myco-core-sub {
+    font-family: var(--font-mono);
+    font-size: 0.55rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-align: center;
+    padding: 0 10px;
+  }
+  .myco-dot {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--blue);
+    box-shadow: 0 0 12px var(--blue);
+  }
+
+  /* ─── SECTION HEADERS ─── */
+  .section-header {
+    text-align: center;
+    margin-bottom: 72px;
+  }
+  .section-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green);
+    background: rgba(16,185,129,0.08);
+    border: 1px solid rgba(16,185,129,0.2);
+    padding: 5px 14px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+  }
+  .section-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 3.5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #f1f5f9;
+    margin-bottom: 16px;
+  }
+  .section-title span {
+    background: linear-gradient(135deg, var(--blue), var(--green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .section-desc {
+    max-width: 600px;
+    margin: 0 auto;
+    color: var(--text-muted);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  /* ─── DIVIDER ─── */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(59,130,246,0.3), rgba(16,185,129,0.3), transparent);
+    margin: 100px 0;
+  }
+
+  /* ─── LATAR BELAKANG ─── */
+  .latbel {
+    padding: 100px 0;
+  }
+  .latbel-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  .latbel-text h3 {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #f1f5f9;
+  }
+  .latbel-text p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.85;
+    margin-bottom: 18px;
+  }
+  .latbel-text p strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .stat-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .stat-card {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.3s ease;
+  }
+  .stat-card:hover {
+    border-color: rgba(59,130,246,0.3);
+    box-shadow: 0 0 30px rgba(59,130,246,0.1);
+    transform: translateY(-4px);
+  }
+  .stat-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+  }
+  .stat-icon.blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .stat-icon.magenta { background: rgba(236,72,153,0.15); color: var(--magenta); }
+  .stat-icon.green { background: rgba(16,185,129,0.15); color: var(--green); }
+  .stat-icon.amber { background: rgba(245,158,11,0.15); color: #f59e0b; }
+
+  .stat-value {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    line-height: 1.4;
+  }
+
+  /* ─── TIGA PILAR ─── */
+  .pilar {
+    padding: 100px 0;
+  }
+  .pilar-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .pilar-card {
+    background: var(--glass);
+    backdrop-filter: blur(24px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 28px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .pilar-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .pilar-card.blue::before { background: linear-gradient(90deg, transparent, var(--blue), transparent); }
+  .pilar-card.magenta::before { background: linear-gradient(90deg, transparent, var(--magenta), transparent); }
+  .pilar-card.green::before { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+
+  .pilar-card:hover {
+    transform: translateY(-10px);
+  }
+  .pilar-card.blue:hover {
+    border-color: rgba(59,130,246,0.35);
+    box-shadow: 0 24px 64px rgba(59,130,246,0.15), 0 0 0 1px rgba(59,130,246,0.1);
+  }
+  .pilar-card.blue:hover::before { opacity: 1; }
+  .pilar-card.magenta:hover {
+    border-color: rgba(236,72,153,0.35);
+    box-shadow: 0 24px 64px rgba(236,72,153,0.15), 0 0 0 1px rgba(236,72,153,0.1);
+  }
+  .pilar-card.magenta:hover::before { opacity: 1; }
+  .pilar-card.green:hover {
+    border-color: rgba(16,185,129,0.35);
+    box-shadow: 0 24px 64px rgba(16,185,129,0.15), 0 0 0 1px rgba(16,185,129,0.1);
+  }
+  .pilar-card.green:hover::before { opacity: 1; }
+
+  .pilar-num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    margin-bottom: 20px;
+    opacity: 0.45;
+  }
+  .pilar-num.blue { color: var(--blue); }
+  .pilar-num.magenta { color: var(--magenta); }
+  .pilar-num.green { color: var(--green); }
+
+  .pilar-icon-wrap {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    margin-bottom: 22px;
+  }
+  .pilar-icon-wrap.blue { background: rgba(59,130,246,0.12); color: var(--blue); box-shadow: 0 0 24px rgba(59,130,246,0.2); }
+  .pilar-icon-wrap.magenta { background: rgba(236,72,153,0.12); color: var(--magenta); box-shadow: 0 0 24px rgba(236,72,153,0.2); }
+  .pilar-icon-wrap.green { background: rgba(16,185,129,0.12); color: var(--green); box-shadow: 0 0 24px rgba(16,185,129,0.2); }
+
+  .pilar-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 14px;
+    line-height: 1.2;
+  }
+  .pilar-desc {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+  .pilar-desc em {
+    font-style: italic;
+  }
+  .pilar-ref {
+    display: inline-block;
+    margin-top: 18px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+  }
+  .pilar-ref.blue { background: rgba(59,130,246,0.1); color: var(--blue); border: 1px solid rgba(59,130,246,0.2); }
+  .pilar-ref.magenta { background: rgba(236,72,153,0.1); color: var(--magenta); border: 1px solid rgba(236,72,153,0.2); }
+  .pilar-ref.green { background: rgba(16,185,129,0.1); color: var(--green); border: 1px solid rgba(16,185,129,0.2); }
+
+  /* ─── SENSOR SIMULASI ─── */
+  .sensor-section {
+    padding: 100px 0;
+  }
+  .sensor-wrapper {
+    max-width: 840px;
+    margin: 0 auto;
+  }
+  .sensor-card-outer {
+    position: relative;
+    border-radius: 28px;
+    padding: 3px;
+    background: linear-gradient(135deg, rgba(59,130,246,0.5), rgba(16,185,129,0.3));
+    box-shadow: 0 0 80px rgba(59,130,246,0.2);
+    transition: all 0.5s ease;
+  }
+  .sensor-card-outer.danger {
+    background: linear-gradient(135deg, rgba(236,72,153,0.6), rgba(236,72,153,0.2));
+    box-shadow: 0 0 80px rgba(236,72,153,0.3);
+  }
+  .sensor-card {
+    background: var(--bg2);
+    border-radius: 26px;
+    padding: 56px 48px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+  }
+  .sensor-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(59,130,246,0.08), transparent 70%);
+    transition: background 0.5s ease;
+  }
+  .sensor-card.danger::before {
+    background: radial-gradient(circle at 50% 50%, rgba(236,72,153,0.12), transparent 70%);
+  }
+
+  .sensor-molecule {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    font-size: 2rem;
+    margin-bottom: 28px;
+    transition: all 0.5s ease;
+    background: rgba(59,130,246,0.12);
+    color: var(--blue);
+    box-shadow: 0 0 32px rgba(59,130,246,0.3);
+  }
+  .sensor-card.danger .sensor-molecule {
+    background: rgba(236,72,153,0.12);
+    color: var(--magenta);
+    box-shadow: 0 0 32px rgba(236,72,153,0.4);
+    animation: shake 0.5s ease;
+  }
+  @keyframes shake {
+    0%, 100% { transform: rotate(0deg); }
+    20% { transform: rotate(-8deg); }
+    40% { transform: rotate(8deg); }
+    60% { transform: rotate(-5deg); }
+    80% { transform: rotate(5deg); }
+  }
+
+  .sensor-ph-badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    padding: 5px 14px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+    background: rgba(59,130,246,0.12);
+    color: var(--blue);
+    border: 1px solid rgba(59,130,246,0.25);
+    transition: all 0.4s ease;
+  }
+  .sensor-card.danger .sensor-ph-badge {
+    background: rgba(236,72,153,0.12);
+    color: var(--magenta);
+    border-color: rgba(236,72,153,0.3);
+  }
+
+  .sensor-status {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3vw, 2.4rem);
+    font-weight: 800;
+    color: var(--blue);
+    margin-bottom: 16px;
+    transition: all 0.4s ease;
+    line-height: 1.2;
+    text-shadow: 0 0 32px rgba(59,130,246,0.4);
+  }
+  .sensor-card.danger .sensor-status {
+    color: var(--magenta);
+    text-shadow: 0 0 32px rgba(236,72,153,0.5);
+  }
+
+  .sensor-detail {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    max-width: 520px;
+    margin: 0 auto 28px;
+    line-height: 1.75;
+    transition: all 0.4s ease;
+  }
+  .sensor-card.danger .sensor-detail {
+    color: #f9a8d4;
+  }
+
+  .sensor-science {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: italic;
+    line-height: 1.7;
+    transition: all 0.4s ease;
+    text-align: left;
+  }
+  .sensor-card.danger .sensor-science {
+    border-color: rgba(236,72,153,0.2);
+    color: rgba(236,72,153,0.6);
+    background: rgba(236,72,153,0.04);
+  }
+
+  .sensor-hint {
+    margin-top: 22px;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .sensor-hint i { animation: bounceX 1.5s ease-in-out infinite; }
+  @keyframes bounceX {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(4px); }
+  }
+
+  /* Color strip */
+  .color-spectrum {
+    margin-top: 40px;
+    background: var(--glass);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+  }
+  .spectrum-title {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+  .spectrum-bar {
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #ef4444 0%, #ec4899 20%, #a855f7 40%, #3b82f6 60%, #06b6d4 80%, #10b981 100%);
+    position: relative;
+    margin-bottom: 10px;
+    box-shadow: 0 0 24px rgba(59,130,246,0.2);
+  }
+  .spectrum-indicator {
+    position: absolute;
+    top: -6px;
+    width: 16px; height: 40px;
+    background: white;
+    border-radius: 3px;
+    box-shadow: 0 0 12px rgba(255,255,255,0.5);
+    transition: left 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    left: 60%;
+    transform: translateX(-50%);
+  }
+  .spectrum-labels {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  /* ─── METODOLOGI ─── */
+  .metodologi {
+    padding: 100px 0;
+  }
+  .metodo-timeline {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .metodo-timeline::before {
+    content: '';
+    position: absolute;
+    left: 28px;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, var(--blue), var(--green), var(--magenta));
+  }
+  .metodo-step {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 24px;
+    margin-bottom: 36px;
+    position: relative;
+  }
+  .metodo-dot {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    border: 2px solid;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    line-height: 1;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    transition: all 0.3s ease;
+    font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  }
+  .metodo-step:hover .metodo-dot { transform: scale(1.1); }
+  .metodo-dot.blue { border-color: var(--blue); color: var(--blue); box-shadow: 0 0 20px rgba(59,130,246,0.3); }
+  .metodo-dot.green { border-color: var(--green); color: var(--green); box-shadow: 0 0 20px rgba(16,185,129,0.3); }
+  .metodo-dot.magenta { border-color: var(--magenta); color: var(--magenta); box-shadow: 0 0 20px rgba(236,72,153,0.3); }
+  .metodo-dot.amber { border-color: #f59e0b; color: #f59e0b; box-shadow: 0 0 20px rgba(245,158,11,0.3); }
+
+  .metodo-content {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 28px;
+    transition: all 0.3s ease;
+  }
+  .metodo-step:hover .metodo-content {
+    border-color: rgba(59,130,246,0.25);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  }
+  .metodo-phase {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .metodo-phase.blue { color: var(--blue); }
+  .metodo-phase.green { color: var(--green); }
+  .metodo-phase.magenta { color: var(--magenta); }
+  .metodo-phase.amber { color: #f59e0b; }
+
+  .metodo-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 10px;
+  }
+  .metodo-body {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+  .metodo-body strong { color: var(--text); font-weight: 500; }
+  .metodo-body em { font-style: italic; color: var(--text); }
+
+  .metodo-params {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .param-chip {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    padding: 3px 10px;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--text-dim);
+  }
+
+  /* ─── BAHAN ─── */
+  .bahan-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 56px;
+  }
+  .bahan-card {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    transition: all 0.3s ease;
+  }
+  .bahan-card:hover {
+    border-color: rgba(59,130,246,0.2);
+    transform: translateY(-3px);
+  }
+  .bahan-cat {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .bahan-name {
+    font-size: 0.9rem;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .bahan-qty {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--blue);
+  }
+
+  /* ─── EVALUASI ─── */
+  .evaluasi {
+    padding: 100px 0;
+  }
+  .eval-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .eval-card {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px 28px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+  }
+  .eval-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .eval-card.blue::after { background: linear-gradient(90deg, transparent, var(--blue), transparent); }
+  .eval-card.magenta::after { background: linear-gradient(90deg, transparent, var(--magenta), transparent); }
+  .eval-card.green::after { background: linear-gradient(90deg, transparent, var(--green), transparent); }
+
+  .eval-card.blue:hover { border-color: rgba(59,130,246,0.3); box-shadow: 0 20px 60px rgba(59,130,246,0.1); transform: translateY(-6px); }
+  .eval-card.magenta:hover { border-color: rgba(236,72,153,0.3); box-shadow: 0 20px 60px rgba(236,72,153,0.1); transform: translateY(-6px); }
+  .eval-card.green:hover { border-color: rgba(16,185,129,0.3); box-shadow: 0 20px 60px rgba(16,185,129,0.1); transform: translateY(-6px); }
+  .eval-card:hover::after { opacity: 1; }
+
+  .eval-num {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 6px;
+    opacity: 0.08;
+    position: absolute;
+    top: 24px; right: 24px;
+  }
+  .eval-num.blue { color: var(--blue); }
+  .eval-num.magenta { color: var(--magenta); }
+  .eval-num.green { color: var(--green); }
+
+  .eval-icon {
+    width: 48px; height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+  }
+  .eval-icon.blue { background: rgba(59,130,246,0.12); color: var(--blue); }
+  .eval-icon.magenta { background: rgba(236,72,153,0.12); color: var(--magenta); }
+  .eval-icon.green { background: rgba(16,185,129,0.12); color: var(--green); }
+
+  .eval-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f1f5f9;
+    margin-bottom: 12px;
+  }
+  .eval-body {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+  .eval-body strong { color: var(--text); font-weight: 500; }
+  .eval-metric {
+    margin-top: 18px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ─── PUSTAKA ─── */
+  .pustaka {
+    padding: 80px 0 100px;
+  }
+  .pustaka-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .pustaka-item {
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+  }
+  .pustaka-item:hover {
+    border-color: rgba(59,130,246,0.2);
+    transform: translateX(4px);
+  }
+  .pustaka-icon {
+    width: 32px; height: 32px;
+    background: rgba(59,130,246,0.1);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--blue);
+    font-size: 0.85rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .pustaka-text {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+  .pustaka-text em { font-style: italic; color: var(--text); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+    text-align: center;
+  }
+  .footer-logo {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    background: linear-gradient(135deg, var(--blue), var(--green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+  .footer-slogan {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    font-style: italic;
+    margin-bottom: 18px;
+  }
+  .footer-note {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+
+  /* ─── SCROLL REVEAL ─── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+    .hero-visual { display: none; }
+    .latbel-grid { grid-template-columns: 1fr; }
+    .pilar-cards { grid-template-columns: 1fr; }
+    .eval-cards { grid-template-columns: 1fr; }
+    .bahan-grid { grid-template-columns: 1fr 1fr; }
+    .pustaka-list { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+    .nav-burger { display: flex; }
+    .sensor-card { padding: 36px 24px; }
+    .stat-cards { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 580px) {
+    .bahan-grid { grid-template-columns: 1fr; }
+    .stat-cards { grid-template-columns: 1fr; }
+    .hero-cta { flex-direction: column; }
+  }
+
+  /* ─── MOBILE NAV OVERLAY ─── */
+  .nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    background: rgba(10,15,30,0.97);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+  }
+  .nav-overlay.open { display: flex; }
+  .nav-overlay a {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .nav-overlay a:hover { color: var(--blue); }
+  .nav-close {
+    position: absolute;
+    top: 28px; right: 28px;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.4); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--blue); }
+</style>
+</head>
+<body>
+
+<!-- ORB FIELD -->
+<div class="orb-field">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <div class="nav-logo">MYSTERO</div>
+    <ul class="nav-links">
+      <li><a href="#latbel">Latar Belakang</a></li>
+      <li><a href="#pilar">3 Pilar Inovasi</a></li>
+      <li><a href="#sensor">Simulasi Sensor</a></li>
+      <li><a href="#metodologi">Metodologi</a></li>
+      <li><a href="#evaluasi">Evaluasi</a></li>
+    </ul>
+    <div class="nav-burger" id="burger">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE OVERLAY -->
+<div class="nav-overlay" id="navOverlay">
+  <span class="nav-close" id="navClose">✕</span>
+  <a href="#latbel" class="nav-ol-link">Latar Belakang</a>
+  <a href="#pilar" class="nav-ol-link">3 Pilar Inovasi</a>
+  <a href="#sensor" class="nav-ol-link">Simulasi Sensor</a>
+  <a href="#metodologi" class="nav-ol-link">Metodologi</a>
+  <a href="#evaluasi" class="nav-ol-link">Evaluasi</a>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-text">
+        <div class="hero-eyebrow">Proposal Penelitian — SmartBook</div>
+        <h1>
+          <span class="line-white">MYST</span><span class="line-blue">ERO</span><br/>
+          <span class="line-white" style="font-size:0.5em; letter-spacing:0.02em; font-weight:600; opacity:0.7;">Mycelium Smart Threat-Evaluating</span><br/>
+          <span class="line-white" style="font-size:0.5em; letter-spacing:0.02em; font-weight:600; opacity:0.7;">&amp; Regrowing Organic-box</span>
+        </h1>
+        <p class="hero-sub">
+          Inovasi kemasan makanan <em>biodegradable</em> berbasis miselium jamur yang terintegrasi dengan sistem indikator kualitas pangan cerdas berbasis antosianin dan lapisan <em>regrowing</em> berteknologi seed bomb — menciptakan siklus <em>zero-waste</em> yang sesungguhnya.
+        </p>
+        <div class="hero-cta">
+          <a href="#pilar" class="btn-primary">
+            🧪 Jelajahi Inovasi
+          </a>
+          <a href="#sensor" class="btn-ghost">
+            ☢️ Uji Sensor Langsung
+          </a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="myco-diagram">
+          <div class="myco-ring"></div>
+          <div class="myco-ring"></div>
+          <div class="myco-ring"></div>
+          <div class="myco-core">
+            <div class="myco-core-label">MYCO</div>
+            <div class="myco-core-sub">MYCELIUM · pH SENSOR<br/>REGROWING · ZERO WASTE</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LATAR BELAKANG -->
+<section class="latbel" id="latbel">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">01 — Latar Belakang Masalah</div>
+      <h2 class="section-title">Dua Krisis yang <span>Mendesak Solusi</span></h2>
+      <p class="section-desc">Dunia modern menghadapi krisis lingkungan dan keamanan pangan secara bersamaan. MYSTERO hadir sebagai jawaban tunggal atas kedua permasalahan kompleks tersebut.</p>
+    </div>
+    <div class="latbel-grid">
+      <div class="latbel-text reveal reveal-delay-1">
+        <h3>Krisis Plastik Sekali Pakai</h3>
+        <p>Menurut penelitian yang dipublikasikan dalam <em>Journal of Biobased Materials and Bioenergy</em> oleh Holt, dkk. (2012), <strong>polistirena (styrofoam)</strong> merupakan material berbasis turunan minyak bumi yang sangat sulit terurai secara alami dan dapat bertahan di lingkungan selama ratusan tahun.</p>
+        <p>Selain berdampak buruk pada ekosistem dasar, penggunaan <em>styrofoam</em> sebagai wadah makanan dengan suhu tinggi berisiko melepaskan <strong>residu kimia karsinogenik</strong> yang membahayakan kesehatan manusia secara langsung.</p>
+        <h3 style="margin-top:28px;">Ancaman Keamanan Pangan</h3>
+        <p>Berdasarkan literatur <em>Fundamental Food Microbiology</em> yang ditulis oleh Ray dan Bhunia (2013), proses pembusukan makanan terjadi ketika <strong>mikroorganisme patogen</strong> mulai memecah rantai karbohidrat dan protein, yang pada prosesnya akan melepaskan senyawa asam (asam laktat) serta gas amonia.</p>
+        <p>Seringkali, konsumen <strong>tidak menyadari proses awal pembusukan</strong> ini karena perubahan aroma dan rasa belum terlalu dominan, sehingga memicu risiko keracunan makanan yang signifikan.</p>
+      </div>
+      <div class="stat-cards reveal reveal-delay-2">
+        <div class="stat-card">
+          <div class="stat-icon magenta">⚠️</div>
+          <div class="stat-value" style="color:var(--magenta);">100s</div>
+          <div class="stat-label">Tahun yang dibutuhkan styrofoam untuk terurai secara alami di lingkungan</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">🧬</div>
+          <div class="stat-value" style="color:var(--blue);">Kitin</div>
+          <div class="stat-label">Senyawa matriks pengikat alami pada miselium yang menggantikan struktur styrofoam</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon green">🌱</div>
+          <div class="stat-value" style="color:var(--green);">Zero</div>
+          <div class="stat-label">Siklus zero-waste — dari kemasan menjadi kompos bernutrisi dan tanaman hidup</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber">💧</div>
+          <div class="stat-value" style="color:#f59e0b;">pH</div>
+          <div class="stat-label">Indikator visual berbasis antosianin yang responsif terhadap perubahan keasaman makanan</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- 3 PILAR INOVASI -->
+<section class="pilar" id="pilar">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">02 — Tiga Pilar Inovasi</div>
+      <h2 class="section-title">Sistem Terintegrasi <span>Tiga Lapisan</span></h2>
+      <p class="section-desc">MYSTERO bukan sekadar kemasan organik. Ia merupakan sistem cerdas yang menggabungkan tiga teknologi mutakhir dalam satu platform material tunggal.</p>
+    </div>
+    <div class="pilar-cards">
+
+      <div class="pilar-card blue reveal reveal-delay-1">
+        <div class="pilar-num blue">PILAR / 01</div>
+        <div class="pilar-icon-wrap blue">🧱</div>
+        <h3 class="pilar-title">Bodi Myco-Composite</h3>
+        <p class="pilar-desc">
+          Berlandaskan pada buku <em>Mycelium Running</em> karya Paul Stamets (2005), miselium jamur tiram putih memiliki senyawa <strong>kitin</strong> yang berfungsi sebagai matriks pengikat alami yang kuat. Hifa mengekskresikan enzim yang memecah komponen selulosa dan lignin pada <em>substrat serbuk gergaji kayu</em>, tumbuh menembus celah-celah material sebagai resin biologis alami. Proses ini menghasilkan komposit padat dengan <strong>sifat insulasi termal</strong> dan bobot ringan yang setara dengan styrofoam konvensional, namun sepenuhnya biodegradable.
+        </p>
+        <span class="pilar-ref blue">Stamets (2005) · Holt, dkk. (2012)</span>
+      </div>
+
+      <div class="pilar-card magenta reveal reveal-delay-2">
+        <div class="pilar-num magenta">PILAR / 02</div>
+        <div class="pilar-icon-wrap magenta">🔬</div>
+        <h3 class="pilar-title">Sensor pH Antosianin</h3>
+        <p class="pilar-desc">
+          Bagian dalam MYSTERO dilapisi ekstrak antosianin dari <em>Bunga Telang (Clitoria ternatea)</em>. Marpaung, dkk. (2015) menyatakan bahwa ekstrak ini mengandung konsentrasi pigmen antosianin yang sangat tinggi. Chu, dkk. (2016) menegaskan bahwa antosianin memiliki <strong>cincin struktur molekul yang sangat tidak stabil terhadap perubahan ion hidrogen (pH)</strong>. Pada kondisi netral: <strong>biru</strong>. Saat terpapar asam laktat dari aktivitas bakteri pembusuk (pH &lt; 7): berubah <strong>merah muda–ungu</strong>. Bila terpapar amonia (pH &gt; 7): bergeser ke <strong>hijau</strong>.
+        </p>
+        <span class="pilar-ref magenta">Chu, dkk. (2016) · Marpaung, dkk. (2015)</span>
+      </div>
+
+      <div class="pilar-card green reveal reveal-delay-3">
+        <div class="pilar-num green">PILAR / 03</div>
+        <div class="pilar-icon-wrap green">🍃</div>
+        <h3 class="pilar-title">Lapisan Regrowing</h3>
+        <p class="pilar-desc">
+          Dinding eksterior MYSTERO mengintegrasikan sistem <em>seed bomb</em> berisi biji tanaman hortikultura (bayam/sawi) yang direkatkan menggunakan tepung tapioka tergelatinisasi sebagai perekat alami. Berdasarkan prinsip ilmu tanah oleh Magdoff dan Van Es (2021), saat kemasan dikubur, <strong>material miselium akan terurai menjadi kompos bernutrisi</strong> — kaya nitrogen dari sisa hifa mati dan karbon dari serbuk kayu — yang memperbaiki porositas tanah dan memicu <strong>perkecambahan biji</strong>, menciptakan siklus tanpa limbah.
+        </p>
+        <span class="pilar-ref green">Magdoff &amp; Van Es (2021)</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- SIMULASI SENSOR CERDAS -->
+<section class="sensor-section" id="sensor">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">03 — Simulasi Interaktif</div>
+      <h2 class="section-title">Simulasi <span>Sensor Cerdas</span></h2>
+      <p class="section-desc">Representasi visual dari sistem indikator pH berbasis antosianin. Arahkan kursor ke panel di bawah untuk mensimulasikan respons sensor terhadap senyawa asam dari makanan yang membusuk.</p>
+    </div>
+    <div class="sensor-wrapper">
+      <div class="sensor-card-outer reveal" id="sensorOuter">
+        <div class="sensor-card" id="sensorCard">
+          <div class="sensor-molecule" id="sensorMol">⚛️</div>
+          <div class="sensor-ph-badge" id="sensorBadge">pH NETRAL — 6.5–7.5</div>
+          <h3 class="sensor-status" id="sensorStatus">Aman (pH Netral)</h3>
+          <p class="sensor-detail" id="sensorDetail">
+            Pelapis antosianin dari ekstrak <em>Bunga Telang (Clitoria ternatea)</em> menampilkan warna biru stabil. Tidak ada aktivitas mikroba pembusuk yang terdeteksi. Makanan dalam kondisi segar dan aman untuk dikonsumsi.
+          </p>
+          <div class="sensor-science" id="sensorScience">
+            📖
+            "Antosianin memiliki cincin struktur molekul yang sangat tidak stabil terhadap perubahan ion hidrogen (pH). Pada kondisi netral, antosianin berwarna biru." — Chu, dkk. (2016) dalam <em>Food Control</em>.
+          </div>
+          <div class="sensor-hint" id="sensorHint">
+            👆 HOVER / TAP UNTUK SIMULASI BAHAYA
+          </div>
+        </div>
+      </div>
+
+      <!-- SPEKTRUM WARNA -->
+      <div class="color-spectrum reveal reveal-delay-2">
+        <div class="spectrum-title">Spektrum Respons Warna Antosianin — Perubahan pH</div>
+        <div class="spectrum-bar">
+          <div class="spectrum-indicator" id="spectrumIndicator"></div>
+        </div>
+        <div class="spectrum-labels">
+          <span style="color:#ef4444;">pH 1–3<br/>Merah</span>
+          <span style="color:#ec4899;">pH 3–5<br/>Merah Muda</span>
+          <span style="color:#a855f7;">pH 5–6<br/>Ungu</span>
+          <span style="color:#3b82f6;">pH 6–8<br/>Biru ◀</span>
+          <span style="color:#06b6d4;">pH 8–10<br/>Cyan</span>
+          <span style="color:#10b981;">pH &gt;10<br/>Hijau</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- METODOLOGI -->
+<section class="metodologi" id="metodologi">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">04 — Metodologi Penelitian</div>
+      <h2 class="section-title">Prosedur <span>Fabrikasi</span></h2>
+      <p class="section-desc">Proses pembuatan MYSTERO dilaksanakan melalui protokol ilmiah terstruktur, mulai dari preparasi substrat hingga aplikasi sistem cerdas pada lapisan kemasan.</p>
+    </div>
+
+    <!-- BAHAN -->
+    <div style="margin-bottom:56px;">
+      <p style="font-family:var(--font-mono);font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dim);margin-bottom:20px;" class="reveal">Komponen Material</p>
+      <div class="bahan-grid reveal reveal-delay-1">
+        <div class="bahan-card">
+          <div class="bahan-cat">Substrat Utama</div>
+          <div class="bahan-name">Serbuk Gergaji Kayu Murni</div>
+          <div class="bahan-qty">1.000 gram</div>
+        </div>
+        <div class="bahan-card">
+          <div class="bahan-cat">Substrat Nutrisi</div>
+          <div class="bahan-name">Dedak (Bekatul)</div>
+          <div class="bahan-qty">200 gram</div>
+        </div>
+        <div class="bahan-card">
+          <div class="bahan-cat">Agen Pengikat Biologis</div>
+          <div class="bahan-name">Bibit Jamur Tiram Putih (F2)</div>
+          <div class="bahan-qty">1 botol</div>
+        </div>
+        <div class="bahan-card">
+          <div class="bahan-cat">Pelapis Sensor pH</div>
+          <div class="bahan-name">Bunga Telang Kering + Agar</div>
+          <div class="bahan-qty">50g + 5g</div>
+        </div>
+        <div class="bahan-card">
+          <div class="bahan-cat">Pelapis Eksterior Regrowing</div>
+          <div class="bahan-name">Tepung Tapioka + Biji Hortikultura</div>
+          <div class="bahan-qty">30g + 20g</div>
+        </div>
+        <div class="bahan-card">
+          <div class="bahan-cat">Disinfektan Sterilisasi</div>
+          <div class="bahan-name">Cairan Etanol</div>
+          <div class="bahan-qty">70% konsentrasi</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="metodo-timeline">
+      <div class="metodo-step reveal">
+        <div class="metodo-dot blue">⚗️</div>
+        <div class="metodo-content">
+          <div class="metodo-phase blue">Fase 01 — Preparasi & Pasteurisasi</div>
+          <div class="metodo-title">Sterilisasi Substrat</div>
+          <p class="metodo-body">Substrat <strong>serbuk kayu dan dedak</strong> dicampur secara homogen. Air ditambahkan hingga mencapai kelembapan <strong>60–65%</strong> (uji kepalan tangan). Campuran dimasukkan ke dalam plastik tahan panas dan <em>dikukus pada suhu 100°C selama 120 menit</em> untuk mengeliminasi seluruh mikroorganisme kontaminan yang dapat bersaing dengan miselium target.</p>
+          <div class="metodo-params">
+            <span class="param-chip">Suhu: 100°C</span>
+            <span class="param-chip">Durasi: 120 menit</span>
+            <span class="param-chip">Kelembapan: 60–65%</span>
+          </div>
+        </div>
+      </div>
+      <div class="metodo-step reveal reveal-delay-1">
+        <div class="metodo-dot green">💉</div>
+        <div class="metodo-content">
+          <div class="metodo-phase green">Fase 02 — Inokulasi</div>
+          <div class="metodo-title">Penanaman Bibit Jamur</div>
+          <p class="metodo-body">Setelah substrat didinginkan hingga mencapai <strong>suhu ruang absolut (± 27°C)</strong>, bibit jamur tiram diinokulasikan ke dalam substrat di dalam <em>lingkungan steril</em> yang telah disemprot etanol 70%. Tahap ini adalah titik kritis yang menentukan kualitas miselium yang tumbuh.</p>
+          <div class="metodo-params">
+            <span class="param-chip">Suhu inokulasi: ±27°C</span>
+            <span class="param-chip">Lingkungan: Steril</span>
+            <span class="param-chip">Disinfektan: Etanol 70%</span>
+          </div>
+        </div>
+      </div>
+      <div class="metodo-step reveal reveal-delay-2">
+        <div class="metodo-dot blue">📦</div>
+        <div class="metodo-content">
+          <div class="metodo-phase blue">Fase 03 — Molding & Inkubasi</div>
+          <div class="metodo-title">Pembentukan Purwarupa</div>
+          <p class="metodo-body">Substrat yang telah diinokulasi <strong>dicetak</strong> dengan cara dipadatkan ke dalam cetakan plastik polipropilena. Cetakan ditutup rapat dengan <em>perforasi kecil untuk sirkulasi udara</em> dan diinkubasi di ruang gelap bersuhu kamar selama <strong>7 hari</strong> hingga miselium menyelimuti seluruh matriks substrat secara merata.</p>
+          <div class="metodo-params">
+            <span class="param-chip">Durasi: 7 hari</span>
+            <span class="param-chip">Kondisi: Gelap</span>
+            <span class="param-chip">Sirkulasi: Perforasi kecil</span>
+          </div>
+        </div>
+      </div>
+      <div class="metodo-step reveal reveal-delay-3">
+        <div class="metodo-dot amber">🔥</div>
+        <div class="metodo-content">
+          <div class="metodo-phase amber">Fase 04 — Inaktivasi Termal</div>
+          <div class="metodo-title">Penghentian Pertumbuhan</div>
+          <p class="metodo-body">Purwarupa dikeluarkan dari cetakan dan dikeringkan di dalam oven pada <strong>suhu 80°C – 90°C selama 120 menit</strong> untuk mematikan sel vegetatif jamur dan mereduksi kadar air struktural. Holt, dkk. (2012) membuktikan bahwa setelah inaktivasi termal, <em>material tidak lagi tumbuh dan sangat aman</em> digunakan sebagai material pengemasan pangan.</p>
+          <div class="metodo-params">
+            <span class="param-chip">Suhu: 80–90°C</span>
+            <span class="param-chip">Durasi: 120 menit</span>
+            <span class="param-chip">Output: Material inert & aman</span>
+          </div>
+        </div>
+      </div>
+      <div class="metodo-step reveal">
+        <div class="metodo-dot magenta">🎨</div>
+        <div class="metodo-content">
+          <div class="metodo-phase magenta">Fase 05 — Aplikasi Sistem Cerdas</div>
+          <div class="metodo-title">Coating Antosianin & Biji Tanaman</div>
+          <p class="metodo-body"><strong>Interior:</strong> Bunga telang direndam dalam 100 ml air mendidih. Ekstrak disaring, dilarutkan bersama <em>bubuk agar-agar</em> hingga viskositas ringan, lalu diaplikasikan ke dinding dalam wadah menggunakan kuas steril. <br/><br/><strong>Eksterior:</strong> Tepung tapioka digelatinisasi dengan air suhu rendah hingga membentuk <em>perekat alami bening</em>. Biji tanaman dicampurkan, lalu suspensi diaplikasikan pada dinding luar dan dikeringkan menggunakan sirkulasi udara suhu ruang.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- EVALUASI -->
+<section class="evaluasi" id="evaluasi">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">05 — Pengujian & Evaluasi</div>
+      <h2 class="section-title">Parameter <span>Keberhasilan</span></h2>
+      <p class="section-desc">Inovasi MYSTERO diukur melalui tiga tahapan pengujian empiris yang terstruktur untuk memvalidasi setiap klaim ilmiah secara objektif dan terukur.</p>
+    </div>
+    <div class="eval-cards">
+
+      <div class="eval-card magenta reveal reveal-delay-1">
+        <div class="eval-num magenta">01</div>
+        <div class="eval-icon magenta">🧪</div>
+        <h3 class="eval-title">Uji Respons Indikator (Sensor pH)</h3>
+        <p class="eval-body">Dilakukan dengan memberikan <strong>paparan buatan</strong> menggunakan penetesan asam asetat (cuka) pada permukaan interior wadah. Pencatatan difokuskan pada <strong>durasi waktu respons</strong> dan presisi perubahan spektrum warna yang terjadi — dari biru netral menjadi ungu atau kemerahan sebagai penanda deteksi asam laktat dari proses pembusukan.</p>
+        <div class="eval-metric">
+          ⏱️
+          Metrik: Waktu respons warna &amp; akurasi pergeseran spektrum
+        </div>
+      </div>
+
+      <div class="eval-card green reveal reveal-delay-2">
+        <div class="eval-num green">02</div>
+        <div class="eval-icon green">🌱</div>
+        <h3 class="eval-title">Uji Viabilitas Perkecambahan</h3>
+        <p class="eval-body">Purwarupa wadah MYSTERO dipecah sebagian dan <strong>ditanam di dalam wadah kontrol</strong> berisi tanah humus dengan observasi kelembapan terkendali. Pencatatan dilakukan untuk mengukur <em>waktu countdown</em> hari pertama biji memecah dormansi (bertunas) dan <strong>laju pelunakan material komposit</strong> yang menunjukkan proses biodegradasi aktif.</p>
+        <div class="eval-metric">
+          📅
+          Metrik: Hari pertama perkecambahan &amp; laju dekomposisi
+        </div>
+      </div>
+
+      <div class="eval-card blue reveal reveal-delay-3">
+        <div class="eval-num blue">03</div>
+        <div class="eval-icon blue">💧</div>
+        <h3 class="eval-title">Uji Resistansi Cairan</h3>
+        <p class="eval-body">Evaluasi kelayakan wadah sebagai kemasan makanan dilakukan dengan <strong>menuangkan air ke dalam MYSTERO</strong> yang telah dilapisi agar-agar untuk menguji permeabilitas pori-pori komposit terhadap kebocoran. Pengujian berlangsung dalam <strong>durasi 120 menit</strong> secara berkelanjutan untuk memastikan integritas struktural selama penggunaan normal.</p>
+        <div class="eval-metric">
+          🕐
+          Metrik: Laju kebocoran selama 120 menit pengujian
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- DAFTAR PUSTAKA -->
+<section class="pustaka" id="pustaka">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">06 — Referensi Ilmiah</div>
+      <h2 class="section-title">Daftar <span>Pustaka</span></h2>
+    </div>
+    <div class="pustaka-list reveal reveal-delay-1">
+      <div class="pustaka-item">
+        <div class="pustaka-icon">📄</div>
+        <div class="pustaka-text">Chu, B. S., dkk. (2016). Anthocyanins as pH-responsive intelligent packaging indicators for fresh food. <em>Food Control</em>.</div>
+      </div>
+      <div class="pustaka-item">
+        <div class="pustaka-icon">📄</div>
+        <div class="pustaka-text">Holt, G. A., McIntyre, G., Flagg, D., Bayer, E., Wanjura, J. D., &amp; Pelletier, M. G. (2012). Fungal Mycelium and Cotton Plant Materials in Sustainable Packaging. <em>Journal of Biobased Materials and Bioenergy</em>, 6(4), 431–439.</div>
+      </div>
+      <div class="pustaka-item">
+        <div class="pustaka-icon">📚</div>
+        <div class="pustaka-text">Magdoff, F., &amp; Van Es, H. (2021). <em>Building Soils for Better Crops</em>. Sustainable Agriculture Research and Education (SARE).</div>
+      </div>
+      <div class="pustaka-item">
+        <div class="pustaka-icon">📄</div>
+        <div class="pustaka-text">Marpaung, A. M., Andarwulan, N., Hariyadi, P., &amp; Faridah, D. N. (2015). Ekstraksi Antosianin dari Bunga Telang (<em>Clitoria ternatea L.</em>) dan Aplikasinya sebagai Pewarna Alami. <em>Jurnal Teknologi dan Industri Pangan</em>.</div>
+      </div>
+      <div class="pustaka-item">
+        <div class="pustaka-icon">📚</div>
+        <div class="pustaka-text">Ray, B., &amp; Bhunia, A. (2013). <em>Fundamental Food Microbiology</em> (5th ed.). CRC Press.</div>
+      </div>
+      <div class="pustaka-item">
+        <div class="pustaka-icon">📚</div>
+        <div class="pustaka-text">Stamets, P. (2005). <em>Mycelium Running: How Mushrooms Can Help Save the World</em>. Ten Speed Press.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-logo">MYSTERO</div>
+    <div class="footer-slogan">"Detects the bad, grows the good."</div>
+    <div class="footer-note">MYCELIUM SMART THREAT-EVALUATING &amp; REGROWING ORGANIC-BOX · PROPOSAL PENELITIAN</div>
+  </div>
+</footer>
+
+<script>
+  // ─── BURGER MENU ───
+  const burger = document.getElementById('burger');
+  const navOverlay = document.getElementById('navOverlay');
+  const navClose = document.getElementById('navClose');
+
+  burger.addEventListener('click', () => navOverlay.classList.add('open'));
+  navClose.addEventListener('click', () => navOverlay.classList.remove('open'));
+
+  document.querySelectorAll('.nav-ol-link').forEach(a => {
+    a.addEventListener('click', () => navOverlay.classList.remove('open'));
+  });
+
+  // ─── SCROLL REVEAL ───
+  const revealEls = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => observer.observe(el));
+
+  // ─── SENSOR SIMULATION ───
+  const sensorCard = document.getElementById('sensorCard');
+  const sensorOuter = document.getElementById('sensorOuter');
+  const sensorMol = document.getElementById('sensorMol');
+  const sensorBadge = document.getElementById('sensorBadge');
+  const sensorStatus = document.getElementById('sensorStatus');
+  const sensorDetail = document.getElementById('sensorDetail');
+  const sensorScience = document.getElementById('sensorScience');
+  const sensorHint = document.getElementById('sensorHint');
+  const spectrumIndicator = document.getElementById('spectrumIndicator');
+
+  const safeState = {
+    badge: 'pH NETRAL — 6.5–7.5',
+    status: 'Aman (pH Netral)',
+    detail: 'Pelapis antosianin dari ekstrak <em>Bunga Telang (Clitoria ternatea)</em> menampilkan warna biru stabil. Tidak ada aktivitas mikroba pembusuk yang terdeteksi. Makanan dalam kondisi segar dan aman untuk dikonsumsi.',
+    science: '📖"Antosianin memiliki cincin struktur molekul yang sangat tidak stabil terhadap perubahan ion hidrogen (pH). Pada kondisi netral, antosianin berwarna biru." — Chu, dkk. (2016) dalam <em>Food Control</em>.',
+    hint: '👆 HOVER / TAP UNTUK SIMULASI BAHAYA',
+    specLeft: '60%',
+    icon: 'emoji-atom'
+  };
+
+  const dangerState = {
+    badge: 'pH ASAM — < 6.5 TERDETEKSI',
+    status: 'BAHAYA: Asam Laktat Terdeteksi (Basi)',
+    detail: 'Sensor antosianin mendeteksi penurunan pH akibat <strong>aktivitas bakteri pembusuk</strong> yang melepaskan senyawa asam laktat. Warna berubah dari biru menjadi merah muda–ungu kemerahan. Segera buang makanan — jangan dikonsumsi.',
+    science: '⚠️"Ketika terpapar asam (pH < 7) akibat aktivitas bakteri pembusuk, warnanya secara progresif akan berubah menjadi merah muda hingga ungu kemerahan." — Ray &amp; Bhunia (2013); Chu, dkk. (2016).',
+    hint: '👈 GESER KURSOR KELUAR UNTUK RESET',
+    specLeft: '15%',
+    icon: 'emoji-biohazard'
+  };
+
+  function applySensorState(state, isDanger) {
+    sensorCard.classList.toggle('danger', isDanger);
+    sensorOuter.classList.toggle('danger', isDanger);
+    sensorBadge.textContent = state.badge;
+    sensorStatus.textContent = state.status;
+    sensorDetail.innerHTML = state.detail;
+    sensorScience.innerHTML = state.science;
+    sensorHint.innerHTML = state.hint;
+    spectrumIndicator.style.left = state.specLeft;
+    sensorMol.textContent = state.icon === 'emoji-atom' ? '⚛️' : '☣️';
+    if (isDanger) sensorMol.querySelector('i').style.animation = '';
+  }
+
+  sensorCard.addEventListener('mouseenter', () => applySensorState(dangerState, true));
+  sensorCard.addEventListener('mouseleave', () => applySensorState(safeState, false));
+
+  // Touch support
+  let touched = false;
+  sensorCard.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    touched = !touched;
+    applySensorState(touched ? dangerState : safeState, touched);
+  }, { passive: false });
+
+  // ─── NAV SCROLL SHRINK ───
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    if (window.scrollY > 60) {
+      nav.style.padding = '12px 0';
+    } else {
+      nav.style.padding = '18px 0';
+    }
+  });
+
+  // ─── PARALLAX ORBS ───
+  window.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 2;
+    const y = (e.clientY / window.innerHeight - 0.5) * 2;
+    document.querySelector('.orb-1').style.transform = `translate(${x * 25}px, ${y * 25}px)`;
+    document.querySelector('.orb-2').style.transform = `translate(${x * -20}px, ${y * -20}px)`;
+    document.querySelector('.orb-3').style.transform = `translate(${x * 15}px, ${y * 15}px)`;
+  });
+</script>
+</body>
+</html>
