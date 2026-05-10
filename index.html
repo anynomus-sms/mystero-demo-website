@@ -6,458 +6,1174 @@
 <title>MYSTERO — Mycelium Smart Threat-Evaluating & Regrowing Organic-box</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0f172a;
-    --bg2: #0a1020;
-    --surface: rgba(255,255,255,0.04);
-    --surface-border: rgba(255,255,255,0.08);
-    --blue: #3b82f6;
-    --blue-glow: rgba(59,130,246,0.35);
-    --blue-dim: rgba(59,130,246,0.15);
-    --pink: #ec4899;
-    --pink-glow: rgba(236,72,153,0.35);
-    --pink-dim: rgba(236,72,153,0.12);
-    --green: #10b981;
-    --green-glow: rgba(16,185,129,0.35);
-    --green-dim: rgba(16,185,129,0.12);
-    --text: #e2e8f0;
-    --text-dim: #94a3b8;
-    --text-dimmer: #475569;
-    --font-head: 'Syne', sans-serif;
-    --font-body: 'DM Sans', sans-serif;
-    --font-mono: 'Space Mono', monospace;
-    --radius: 16px;
-    --radius-lg: 24px;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 16px;
-    line-height: 1.7;
-    overflow-x: hidden;
-  }
-  ::selection { background: var(--blue-dim); color: #fff; }
-  /* SCROLLBAR */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg2); }
-  ::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 3px; }
+:root {
+  --bg:        #060d1a;
+  --bg2:       #081020;
+  --bg3:       #0b1628;
+  --surface:   rgba(255,255,255,0.035);
+  --border:    rgba(255,255,255,0.075);
+  --border-hi: rgba(255,255,255,0.14);
+  --blue:      #3b82f6;
+  --blue2:     #60a5fa;
+  --blue-g:    rgba(59,130,246,0.30);
+  --blue-d:    rgba(59,130,246,0.10);
+  --pink:      #ec4899;
+  --pink2:     #f472b6;
+  --pink-g:    rgba(236,72,153,0.32);
+  --pink-d:    rgba(236,72,153,0.10);
+  --green:     #10b981;
+  --green2:    #34d399;
+  --green-g:   rgba(16,185,129,0.30);
+  --green-d:   rgba(16,185,129,0.10);
+  --amber:     #f59e0b;
+  --text:      #e2e8f0;
+  --text-2:    #94a3b8;
+  --text-3:    #4b6080;
+  --ff-head:   'Outfit', sans-serif;
+  --ff-body:   'Outfit', sans-serif;
+  --ff-serif:  'Lora', serif;
+  --ff-mono:   'JetBrains Mono', monospace;
+  --r:         14px;
+  --r2:        22px;
+  --r3:        32px;
+}
 
-  /* NAV */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    padding: 20px 5vw;
-    display: flex; align-items: center; justify-content: space-between;
-    backdrop-filter: blur(20px);
-    background: rgba(15,23,42,0.75);
-    border-bottom: 1px solid var(--surface-border);
-    transition: all 0.3s;
-  }
-  .nav-logo {
-    font-family: var(--font-head); font-weight: 800; font-size: 1.4rem;
-    background: linear-gradient(135deg, var(--blue), var(--green));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    letter-spacing: 0.05em;
-  }
-  .nav-links { display: flex; gap: 32px; list-style: none; }
-  .nav-links a {
-    color: var(--text-dim); text-decoration: none; font-size: 0.85rem;
-    font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--blue); }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
 
-  /* SECTION UTILS */
-  section { padding: 100px 5vw; }
-  .section-label {
-    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.2em;
-    text-transform: uppercase; color: var(--blue); margin-bottom: 14px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .section-label::before {
-    content: ''; display: block; width: 24px; height: 1px; background: var(--blue);
-  }
-  h2 {
-    font-family: var(--font-head); font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-    font-weight: 800; line-height: 1.15; margin-bottom: 16px;
-  }
-  .lead { font-size: 1.05rem; color: var(--text-dim); max-width: 580px; margin-bottom: 56px; }
-  .glass {
-    background: var(--surface);
-    border: 1px solid var(--surface-border);
-    border-radius: var(--radius-lg);
-    backdrop-filter: blur(12px);
-  }
-  .glow-blue { box-shadow: 0 0 40px var(--blue-glow); }
-  .glow-pink { box-shadow: 0 0 40px var(--pink-glow); }
-  .glow-green { box-shadow: 0 0 40px var(--green-glow); }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--ff-body);
+  line-height: 1.75;
+  overflow-x: hidden;
+}
 
-  /* REVEAL ANIMATIONS */
-  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
-  .reveal.visible { opacity: 1; transform: translateY(0); }
-  .reveal-left { opacity: 0; transform: translateX(-40px); transition: opacity 0.8s ease, transform 0.8s ease; }
-  .reveal-left.visible { opacity: 1; transform: translateX(0); }
-  .reveal-scale { opacity: 0; transform: scale(0.9); transition: opacity 0.7s ease, transform 0.7s ease; }
-  .reveal-scale.visible { opacity: 1; transform: scale(1); }
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--blue); border-radius: 10px; }
+::selection { background: var(--blue-d); }
 
-  /* ===== HERO ===== */
-  #hero {
-    min-height: 100vh;
-    display: flex; flex-direction: column; justify-content: center;
-    padding: 120px 5vw 80px;
-    position: relative; overflow: hidden;
-  }
-  .hero-bg {
-    position: absolute; inset: 0; z-index: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 70% 40%, rgba(59,130,246,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 10% 80%, rgba(16,185,129,0.08) 0%, transparent 55%),
-      radial-gradient(ellipse 40% 40% at 85% 80%, rgba(236,72,153,0.07) 0%, transparent 50%);
-  }
-  .hero-grid {
-    position: absolute; inset: 0; z-index: 0;
-    background-image:
-      linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
-  }
-  .hero-content { position: relative; z-index: 2; max-width: 900px; }
-  .hero-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 8px 16px; border-radius: 100px;
-    background: var(--blue-dim); border: 1px solid var(--blue);
-    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.12em;
-    color: var(--blue); margin-bottom: 32px;
-    animation: pulse-badge 3s ease-in-out infinite;
-  }
-  .hero-badge-dot {
-    width: 6px; height: 6px; border-radius: 50%; background: var(--blue);
-    animation: blink 1.5s ease-in-out infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
-  @keyframes pulse-badge { 0%,100%{box-shadow:0 0 0 0 var(--blue-glow)} 50%{box-shadow:0 0 20px 4px var(--blue-glow)} }
-  h1 {
-    font-family: var(--font-head); font-size: clamp(2.2rem, 5.5vw, 5rem);
-    font-weight: 800; line-height: 1.05; margin-bottom: 24px;
-  }
-  .h1-accent { color: var(--blue); }
-  .hero-sub {
-    font-size: clamp(1.1rem, 2vw, 1.4rem); color: var(--text-dim);
-    font-style: italic; margin-bottom: 48px; font-weight: 300;
-  }
-  .hero-sub span { color: var(--green); font-style: normal; font-weight: 500; }
-  .hero-cta {
-    display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 80px;
-  }
-  .btn {
-    padding: 14px 28px; border-radius: 100px; font-weight: 600;
-    font-family: var(--font-body); font-size: 0.9rem; cursor: pointer;
-    border: none; transition: all 0.25s; text-decoration: none; display: inline-block;
-    letter-spacing: 0.02em;
-  }
-  .btn-primary {
-    background: var(--blue); color: #fff;
-    box-shadow: 0 4px 24px var(--blue-glow);
-  }
-  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 40px var(--blue-glow); background: #60a5fa; }
-  .btn-ghost {
-    background: transparent; color: var(--text);
-    border: 1px solid var(--surface-border);
-  }
-  .btn-ghost:hover { border-color: var(--blue); color: var(--blue); transform: translateY(-2px); }
+/* ─── UTIL ─────────────────────────────────── */
+.tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 14px; border-radius: 100px;
+  font-family: var(--ff-mono); font-size: 0.68rem;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  border: 1px solid var(--blue); color: var(--blue);
+  background: var(--blue-d);
+  margin-bottom: 24px;
+}
+.tag-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--blue); animation: blink 1.6s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.15} }
 
-  /* 3D BOX FLOAT */
-  .hero-box-wrap {
-    position: absolute; right: 5vw; top: 50%; transform: translateY(-50%);
-    z-index: 2; animation: float-box 5s ease-in-out infinite;
-  }
-  @keyframes float-box {
-    0%,100%{transform:translateY(-50%) rotate3d(1,1,0,0deg)}
-    33%{transform:translateY(calc(-50% - 18px)) rotate3d(1,1,0,4deg)}
-    66%{transform:translateY(calc(-50% + 10px)) rotate3d(1,1,0,-3deg)}
-  }
-  .hero-box {
-    width: 180px; height: 180px;
-    background: linear-gradient(135deg, rgba(59,130,246,0.25), rgba(16,185,129,0.15));
-    border: 1px solid rgba(59,130,246,0.5);
-    border-radius: 20px;
-    position: relative;
-    box-shadow: 0 0 60px var(--blue-glow), inset 0 0 30px rgba(59,130,246,0.1);
-    transform-style: preserve-3d;
-  }
-  .hero-box::before {
-    content: ''; position: absolute; inset: 0; border-radius: 20px;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 60%);
-  }
-  .hero-box-inner {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-    text-align: center;
-  }
-  .hero-box-icon { font-size: 3rem; margin-bottom: 8px; filter: drop-shadow(0 0 12px var(--blue)); }
-  .hero-box-text { font-family: var(--font-mono); font-size: 0.6rem; color: var(--blue); letter-spacing: 0.1em; }
-  .hero-box-ring {
-    position: absolute; inset: -20px; border-radius: 50%;
-    border: 1px dashed rgba(59,130,246,0.3);
-    animation: spin-ring 20s linear infinite;
-  }
-  .hero-box-ring2 {
-    position: absolute; inset: -40px; border-radius: 50%;
-    border: 1px dashed rgba(16,185,129,0.2);
-    animation: spin-ring 30s linear infinite reverse;
-  }
-  @keyframes spin-ring { to { transform: rotate(360deg); } }
+.chip {
+  display: inline-block; padding: 3px 10px; border-radius: 6px;
+  font-family: var(--ff-mono); font-size: 0.65rem; letter-spacing: 0.08em;
+  background: var(--blue-d); color: var(--blue2); border: 1px solid rgba(59,130,246,0.25);
+  vertical-align: middle; margin-left: 6px;
+}
 
-  /* SCROLL DOWN */
-  .scroll-down {
-    position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
-    font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.15em;
-    color: var(--text-dimmer); cursor: pointer; z-index: 2;
-    animation: bounce-down 2.5s ease-in-out infinite;
-  }
-  .scroll-down-arrow {
-    width: 28px; height: 28px; border-right: 2px solid var(--text-dimmer);
-    border-bottom: 2px solid var(--text-dimmer); transform: rotate(45deg);
-  }
-  @keyframes bounce-down { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(10px)} }
+h2 {
+  font-family: var(--ff-head); font-size: clamp(1.85rem, 3.5vw, 3rem);
+  font-weight: 800; line-height: 1.12; margin-bottom: 14px;
+  letter-spacing: -0.02em;
+}
+h3 { font-family: var(--ff-head); font-weight: 700; line-height: 1.25; }
+.lead { font-size: 1rem; color: var(--text-2); max-width: 640px; margin-bottom: 52px; line-height: 1.8; }
+.cite {
+  font-family: var(--ff-mono); font-size: 0.65rem; color: var(--text-3);
+  letter-spacing: 0.05em;
+}
 
-  /* ===== KRISIS ===== */
-  #krisis { background: var(--bg2); }
-  .krisis-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 48px;
-  }
-  .krisis-card {
-    padding: 36px; border-radius: var(--radius-lg);
-    background: var(--surface); border: 1px solid var(--surface-border);
-    transition: transform 0.3s, box-shadow 0.3s;
-    cursor: default;
-  }
-  .krisis-card:hover { transform: translateY(-6px); }
-  .krisis-card:nth-child(1):hover { box-shadow: 0 20px 60px var(--pink-glow); border-color: rgba(236,72,153,0.3); }
-  .krisis-card:nth-child(2):hover { box-shadow: 0 20px 60px var(--green-glow); border-color: rgba(16,185,129,0.3); }
-  .krisis-card-icon { font-size: 2.5rem; margin-bottom: 16px; }
-  .krisis-card h3 { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; }
-  .krisis-card p { color: var(--text-dim); font-size: 0.92rem; line-height: 1.7; }
-  .counters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
-  .counter-card {
-    padding: 40px; border-radius: var(--radius-lg); text-align: center;
-    background: linear-gradient(135deg, var(--surface), rgba(59,130,246,0.05));
-    border: 1px solid rgba(59,130,246,0.2);
-    box-shadow: 0 0 30px var(--blue-glow);
-  }
-  .counter-val {
-    font-family: var(--font-head); font-size: clamp(2.5rem, 5vw, 4rem);
-    font-weight: 800; color: var(--blue); line-height: 1;
-    margin-bottom: 8px;
-  }
-  .counter-label { color: var(--text-dim); font-size: 0.85rem; letter-spacing: 0.05em; }
+section { padding: 96px 6vw; }
+.sec-tag {
+  font-family: var(--ff-mono); font-size: 0.66rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--blue);
+  display: flex; align-items: center; gap: 10px; margin-bottom: 18px;
+}
+.sec-tag::before { content:''; display:block; width:20px; height:1px; background:var(--blue); }
 
-  /* ===== PILAR ===== */
-  #pilar { }
-  .pilar-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-  .flip-card { perspective: 1000px; height: 340px; cursor: pointer; }
-  .flip-inner {
-    width: 100%; height: 100%;
-    transform-style: preserve-3d; transition: transform 0.7s cubic-bezier(0.4,0,0.2,1);
-    position: relative;
-  }
-  .flip-card:hover .flip-inner, .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
-  .flip-front, .flip-back {
-    position: absolute; inset: 0; border-radius: var(--radius-lg);
-    backface-visibility: hidden; -webkit-backface-visibility: hidden;
-    padding: 36px; display: flex; flex-direction: column; justify-content: flex-end;
-    border: 1px solid var(--surface-border);
-  }
-  .flip-front {
-    background: var(--surface);
-    overflow: hidden;
-  }
-  .flip-front::before {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(to bottom, transparent 30%, rgba(15,23,42,0.9));
-  }
-  .flip-front-icon {
-    position: absolute; top: 28px; right: 28px; font-size: 3.5rem;
-    filter: drop-shadow(0 0 20px currentColor); opacity: 0.8;
-  }
-  .flip-front h3 {
-    font-family: var(--font-head); font-size: 1.3rem; font-weight: 800;
-    position: relative; z-index: 1;
-  }
-  .flip-front .flip-sub { color: var(--text-dim); font-size: 0.8rem; position: relative; z-index: 1; margin-top: 6px; }
-  .flip-back {
-    background: var(--surface); transform: rotateY(180deg);
-    justify-content: center;
-  }
-  .flip-back p { color: var(--text-dim); font-size: 0.9rem; line-height: 1.75; }
-  .flip-back h3 { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
-  .flip-card:nth-child(1) .flip-front { background: linear-gradient(135deg, #1e3a5f, #0f172a); }
-  .flip-card:nth-child(1) .flip-front-icon { color: var(--blue); }
-  .flip-card:nth-child(1):hover .flip-front { box-shadow: 0 0 40px var(--blue-glow); }
-  .flip-card:nth-child(2) .flip-front { background: linear-gradient(135deg, #2d1b4e, #0f172a); }
-  .flip-card:nth-child(2) .flip-front-icon { color: var(--pink); }
-  .flip-card:nth-child(2):hover .flip-front { box-shadow: 0 0 40px var(--pink-glow); }
-  .flip-card:nth-child(3) .flip-front { background: linear-gradient(135deg, #0d3321, #0f172a); }
-  .flip-card:nth-child(3) .flip-front-icon { color: var(--green); }
-  .flip-card:nth-child(3):hover .flip-front { box-shadow: 0 0 40px var(--green-glow); }
-  .flip-hint {
-    position: absolute; bottom: 16px; right: 20px;
-    font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-dimmer);
-    z-index: 2; transition: opacity 0.3s;
-  }
-  .flip-card:hover .flip-hint { opacity: 0; }
+.glass {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  backdrop-filter: blur(14px);
+}
 
-  /* ===== SENSOR SIMULATOR ===== */
-  #sensor { background: var(--bg2); }
-  .sensor-demo {
-    max-width: 700px; margin: 0 auto;
-    padding: 60px 48px; border-radius: 28px;
-    background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(59,130,246,0.05));
-    border: 2px solid var(--blue);
-    box-shadow: 0 0 60px var(--blue-glow), 0 0 120px rgba(59,130,246,0.1);
-    text-align: center; cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
-    position: relative; overflow: hidden;
-    user-select: none;
-  }
-  .sensor-demo::before {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(59,130,246,0.1), transparent 70%);
-    transition: all 0.4s;
-  }
-  .sensor-demo:hover {
-    background: linear-gradient(135deg, rgba(236,72,153,0.35), rgba(236,72,153,0.1));
-    border-color: var(--pink);
-    box-shadow: 0 0 80px var(--pink-glow), 0 0 160px rgba(236,72,153,0.12);
-    transform: scale(1.02);
-  }
-  .sensor-demo:hover::before {
-    background: radial-gradient(circle at 50% 50%, rgba(236,72,153,0.15), transparent 70%);
-  }
-  .sensor-status {
-    font-family: var(--font-head); font-size: clamp(1.4rem, 3vw, 2.2rem);
-    font-weight: 800; transition: all 0.4s; color: var(--blue);
-    margin-bottom: 16px; position: relative; z-index: 1;
-  }
-  .sensor-demo:hover .sensor-status { color: var(--pink); }
-  .sensor-ph {
-    font-family: var(--font-mono); font-size: 4rem; font-weight: 700;
-    transition: all 0.4s; color: rgba(59,130,246,0.7);
-    position: relative; z-index: 1; line-height: 1;
-  }
-  .sensor-demo:hover .sensor-ph { color: rgba(236,72,153,0.9); }
-  .sensor-desc {
-    font-size: 0.85rem; color: var(--text-dim); margin-top: 16px;
-    transition: color 0.4s; position: relative; z-index: 1;
-  }
-  .sensor-demo:hover .sensor-desc { color: rgba(236,72,153,0.8); }
-  .sensor-hint {
-    margin-top: 32px; font-family: var(--font-mono); font-size: 0.65rem;
-    color: var(--text-dimmer); letter-spacing: 0.1em;
-  }
-  /* Molecular shape */
-  .mol-shape {
-    width: 80px; height: 80px; margin: 0 auto 24px;
-    position: relative; z-index: 1;
-    transition: all 0.4s;
-  }
-  .mol-ring {
-    width: 60px; height: 60px; border-radius: 50%;
-    border: 3px solid var(--blue);
-    margin: 0 auto 8px;
-    transition: all 0.4s;
-    box-shadow: 0 0 15px var(--blue-glow);
-    display: flex; align-items: center; justify-content: center;
-  }
-  .mol-ring-inner {
-    width: 24px; height: 24px; border-radius: 50%;
-    background: var(--blue); transition: all 0.4s;
-    opacity: 0.6;
-  }
-  .sensor-demo:hover .mol-ring { border-color: var(--pink); box-shadow: 0 0 20px var(--pink-glow), 0 0 40px var(--pink-glow); border-radius: 30% 70% 70% 30%/30% 30% 70% 70%; animation: agitate 0.5s ease-in-out infinite alternate; }
-  .sensor-demo:hover .mol-ring-inner { background: var(--pink); border-radius: 20% 80% 30% 70%/50% 30% 70% 50%; }
-  @keyframes agitate { to { transform: rotate(8deg) scale(1.1); border-radius: 70% 30% 30% 70%/70% 70% 30% 30%; } }
+/* REVEAL */
+.rv  { opacity:0; transform:translateY(36px); transition:opacity .8s ease,transform .8s ease; }
+.rv2 { opacity:0; transform:translateY(36px); transition:opacity .8s .15s ease,transform .8s .15s ease; }
+.rv3 { opacity:0; transform:translateY(36px); transition:opacity .8s .3s ease,transform .8s .3s ease; }
+.rvl { opacity:0; transform:translateX(-36px); transition:opacity .8s ease,transform .8s ease; }
+.rvs { opacity:0; transform:scale(0.92); transition:opacity .7s ease,transform .7s ease; }
+.in  { opacity:1 !important; transform:none !important; }
 
-  /* ===== MOLECULAR ===== */
-  #molecular { }
+/* ─── NAV ───────────────────────────────────── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  padding: 18px 6vw;
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(6,13,26,0.8);
+  backdrop-filter: blur(22px);
+  border-bottom: 1px solid var(--border);
+  transition: background .4s;
+}
+.nav-logo {
+  font-family: var(--ff-head); font-weight: 900; font-size: 1.3rem;
+  letter-spacing: 0.08em;
+  background: linear-gradient(110deg, var(--blue2), var(--green2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.nav-links { display: flex; gap: 30px; list-style: none; }
+.nav-links a {
+  color: var(--text-2); text-decoration: none; font-size: 0.82rem;
+  font-weight: 500; letter-spacing: 0.04em;
+  transition: color .2s;
+}
+.nav-links a:hover { color: var(--blue2); }
+.nav-cta {
+  padding: 9px 22px; border-radius: 100px; font-size: 0.8rem; font-weight: 600;
+  background: var(--blue); color: #fff; border: none; cursor: pointer;
+  transition: all .25s; font-family: var(--ff-head);
+}
+.nav-cta:hover { transform: translateY(-2px); box-shadow: 0 6px 24px var(--blue-g); }
 
-  /* ===== CIRCULAR ECONOMY ===== */
-  #circular { background: var(--bg2); }
-  .cycle-steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-top: 48px; }
-  .cycle-step {
-    padding: 32px 24px; border-radius: var(--radius-lg);
-    background: var(--surface); border: 1px solid var(--surface-border);
-    text-align: center; cursor: pointer; transition: all 0.35s;
-    position: relative; overflow: hidden;
-  }
-  .cycle-step::before {
-    content: ''; position: absolute; inset: 0;
-    background: linear-gradient(135deg, transparent, rgba(255,255,255,0.02));
-    opacity: 0; transition: opacity 0.3s;
-  }
-  .cycle-step:hover::before { opacity: 1; }
-  .cycle-step.active {
-    border-color: var(--blue);
-    box-shadow: 0 0 40px var(--blue-glow);
-    background: linear-gradient(135deg, rgba(59,130,246,0.12), var(--surface));
-    transform: translateY(-8px);
-  }
-  .cycle-step-num {
-    font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dimmer);
-    margin-bottom: 12px; letter-spacing: 0.1em;
-  }
-  .cycle-step-icon { font-size: 2.5rem; margin-bottom: 16px; }
-  .cycle-step h3 { font-family: var(--font-head); font-size: 1rem; font-weight: 700; margin-bottom: 10px; }
-  .cycle-step p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.65; }
-  .cycle-detail {
-    margin-top: 24px; padding: 28px 36px; border-radius: var(--radius);
-    background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02));
-    border: 1px solid rgba(59,130,246,0.25);
-    transition: all 0.4s;
-    min-height: 80px; display: flex; align-items: center;
-  }
-  .cycle-detail p { color: var(--text-dim); font-size: 0.92rem; }
+/* ─── HERO ─────────────────────────────────── */
+#hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 130px 6vw 80px;
+  position: relative; overflow: hidden;
+}
 
-  /* ===== TIMELINE ===== */
-  #timeline { }
-  .timeline-wrap { position: relative; max-width: 720px; margin: 0 auto; }
-  .timeline-line {
-    position: absolute; left: 28px; top: 0; bottom: 0; width: 2px;
-    background: var(--surface-border);
-  }
-  .timeline-progress {
-    position: absolute; left: 0; top: 0; width: 100%;
-    background: linear-gradient(to bottom, var(--blue), var(--green));
-    transition: height 0.4s ease;
-    height: 0%;
-  }
-  .timeline-item {
-    display: flex; gap: 36px; margin-bottom: 52px; position: relative;
-    transition: all 0.3s;
-  }
-  .timeline-dot {
-    width: 56px; height: 56px; border-radius: 50%; flex-shrink: 0;
-    background: var(--bg); border: 2px solid var(--surface-border);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.4rem; transition: all 0.4s; position: relative; z-index: 1;
-  }
-  .timeline-item.lit .timeline-dot {
-    border-color: var(--blue);
-    box-shadow: 0 0 24px var(--blue-glow);
-    background: linear-gradient(135deg, rgba(59,130,246,0.2), var(--bg));
-  }
-  .timeline-body { padding-top: 8px; }
-  .timeline-step-num { font-family: var(--font-mono); font-size: 0.65rem; color: var(--blue); letter-spacing: 0.12em; margin-bottom: 6px; }
-  .timeline-body h3 { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; margin-bottom: 8px; }
-  .timeline-body p { color: var(--text-dim); font-size: 0.92rem; }
+/* parallax bg layers */
+.hero-layer {
+  position: absolute; inset: 0; pointer-events: none;
+}
+.hero-layer-1 {
+  background:
+    radial-gradient(ellipse 100% 80% at 60% 30%, rgba(59,130,246,0.13) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 60% at 5%  90%, rgba(16,185,129,0.09) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 50% at 95% 75%, rgba(236,72,153,0.07) 0%, transparent 50%);
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(59,130,246,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59,130,246,0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 90% 90% at 50% 40%, black 20%, transparent 100%);
+}
 
-  /* ===== PENGUJIAN ===== */
-  #pengujian { background: var(--bg2); }
-  .metric-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
-  .metric-card {
-    padding: 36px 28px; border-radius: var(--radius-lg);
+.hero-wrap { position: relative; z-index: 2; display: grid; grid-template-columns: 1fr 480px; gap: 40px; align-items: center; max-width: 1300px; }
+
+.hero-text {}
+.hero-eyebrow { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+.hero-eyebrow-line { width: 36px; height: 1px; background: var(--blue); }
+.hero-eyebrow-text { font-family: var(--ff-mono); font-size: 0.68rem; letter-spacing: 0.18em; color: var(--blue); text-transform: uppercase; }
+
+h1 {
+  font-family: var(--ff-head); font-weight: 900;
+  font-size: clamp(2.4rem, 5.5vw, 5.2rem);
+  line-height: 1.02; letter-spacing: -0.03em;
+  margin-bottom: 28px;
+}
+.h1-blue { color: var(--blue2); }
+.hero-tagline {
+  font-family: var(--ff-serif); font-size: clamp(1rem, 1.8vw, 1.3rem);
+  color: var(--text-2); font-style: italic; margin-bottom: 20px;
+}
+.hero-tagline strong { color: var(--green2); font-style: normal; font-weight: 600; }
+.hero-desc { font-size: 0.95rem; color: var(--text-2); line-height: 1.85; max-width: 560px; margin-bottom: 40px; }
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+.btn {
+  padding: 13px 28px; border-radius: 100px; font-weight: 600;
+  font-family: var(--ff-head); font-size: 0.88rem; cursor: pointer;
+  border: none; transition: all .25s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-primary { background: var(--blue); color: #fff; box-shadow: 0 4px 28px var(--blue-g); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 48px var(--blue-g); background: #5094ff; }
+.btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border-hi); }
+.btn-outline:hover { border-color: var(--blue); color: var(--blue2); transform: translateY(-2px); }
+
+/* HERO VISUAL */
+.hero-visual {
+  position: relative; display: flex; justify-content: center; align-items: center;
+}
+.hero-box-scene { width: 320px; height: 320px; perspective: 800px; margin: 0 auto; }
+.hero-box-3d {
+  width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  animation: float3d 7s ease-in-out infinite;
+  position: relative;
+}
+@keyframes float3d {
+  0%,100% { transform: rotateX(8deg) rotateY(-12deg) translateY(0); }
+  33%     { transform: rotateX(4deg) rotateY(8deg)  translateY(-18px); }
+  66%     { transform: rotateX(12deg) rotateY(-6deg) translateY(10px); }
+}
+.box-face {
+  position: absolute; border-radius: 22px;
+  backface-visibility: hidden;
+}
+.box-front {
+  width: 220px; height: 220px;
+  left: 50px; top: 50px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.22), rgba(16,185,129,0.12));
+  border: 1.5px solid rgba(59,130,246,0.5);
+  box-shadow: 0 0 60px var(--blue-g), inset 0 0 30px rgba(59,130,246,0.08);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px;
+}
+.box-front::before {
+  content: ''; position: absolute; inset: 0; border-radius: 22px;
+  background: linear-gradient(145deg, rgba(255,255,255,0.09) 0%, transparent 55%);
+}
+.box-icon { font-size: 3.5rem; filter: drop-shadow(0 0 16px rgba(59,130,246,0.7)); }
+.box-label { font-family: var(--ff-mono); font-size: 0.58rem; color: var(--blue2); letter-spacing: 0.15em; text-align: center; }
+
+.orbit {
+  position: absolute; border-radius: 50%;
+  border: 1px dashed;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  pointer-events: none;
+}
+.orbit-1 { width: 290px; height: 290px; border-color: rgba(59,130,246,0.22); animation: spin 22s linear infinite; }
+.orbit-2 { width: 350px; height: 350px; border-color: rgba(16,185,129,0.14); animation: spin 34s linear infinite reverse; }
+.orbit-3 { width: 420px; height: 420px; border-color: rgba(236,72,153,0.09); animation: spin 48s linear infinite; }
+@keyframes spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+.orbit-dot {
+  position: absolute; width: 7px; height: 7px; border-radius: 50%;
+  top: 0; left: 50%; transform: translate(-50%, -50%);
+}
+.orbit-dot-1 { background: var(--blue); box-shadow: 0 0 8px var(--blue-g); }
+.orbit-dot-2 { background: var(--green); box-shadow: 0 0 8px var(--green-g); }
+.orbit-dot-3 { background: var(--pink); box-shadow: 0 0 8px var(--pink-g); }
+
+/* scroll indicator */
+.scroll-ind {
+  position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  font-family: var(--ff-mono); font-size: 0.6rem; letter-spacing: 0.18em; color: var(--text-3);
+  z-index: 2; cursor: pointer; animation: bob 2.5s ease-in-out infinite;
+}
+.scroll-ind svg { opacity: 0.5; }
+@keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(9px)} }
+
+/* hero stats strip */
+.hero-stats {
+  position: relative; z-index: 2; display: flex; gap: 0;
+  margin-top: 48px; max-width: 1300px;
+  border: 1px solid var(--border); border-radius: var(--r2);
+  overflow: hidden;
+}
+.hero-stat {
+  flex: 1; padding: 24px 28px; border-right: 1px solid var(--border);
+  background: rgba(255,255,255,0.018);
+}
+.hero-stat:last-child { border-right: none; }
+.hero-stat-val { font-family: var(--ff-head); font-size: 1.9rem; font-weight: 800; color: var(--blue2); line-height: 1; margin-bottom: 4px; }
+.hero-stat-label { font-size: 0.78rem; color: var(--text-3); }
+
+/* ─── KRISIS ────────────────────────────────── */
+#krisis { background: var(--bg2); }
+.krisis-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px; }
+.krisis-card {
+  padding: 36px; border-radius: var(--r2); position: relative; overflow: hidden;
+  background: var(--surface); border: 1px solid var(--border);
+  transition: transform .35s, box-shadow .35s, border-color .35s;
+  cursor: default;
+}
+.krisis-card::before {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  transform: scaleX(0); transform-origin: left; transition: transform .4s;
+}
+.krisis-card:nth-child(1)::before { background: linear-gradient(90deg, var(--pink), transparent); }
+.krisis-card:nth-child(2)::before { background: linear-gradient(90deg, var(--amber), transparent); }
+.krisis-card:hover { transform: translateY(-6px); }
+.krisis-card:hover::before { transform: scaleX(1); }
+.krisis-card:nth-child(1):hover { box-shadow: 0 20px 60px rgba(236,72,153,0.15); border-color: rgba(236,72,153,0.25); }
+.krisis-card:nth-child(2):hover { box-shadow: 0 20px 60px rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.25); }
+.kc-icon { font-size: 2.4rem; margin-bottom: 18px; }
+.kc-title { font-family: var(--ff-head); font-size: 1.05rem; font-weight: 700; margin-bottom: 14px; }
+.kc-body { font-size: 0.9rem; color: var(--text-2); line-height: 1.8; margin-bottom: 14px; }
+
+.counters { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.counter-box {
+  padding: 44px 36px; border-radius: var(--r2); text-align: center;
+  background: linear-gradient(135deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02));
+  border: 1px solid rgba(59,130,246,0.2);
+  box-shadow: 0 0 40px rgba(59,130,246,0.07);
+  position: relative; overflow: hidden;
+}
+.counter-box::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+}
+.cnt-val {
+  font-family: var(--ff-head); font-size: clamp(2.6rem, 4.5vw, 4.2rem);
+  font-weight: 900; color: var(--blue2); line-height: 1; margin-bottom: 8px;
+  letter-spacing: -0.03em;
+}
+.cnt-lbl { font-size: 0.82rem; color: var(--text-3); letter-spacing: 0.04em; }
+
+/* ─── PILAR ─────────────────────────────────── */
+#pilar {}
+.pilar-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+.flip-card { perspective: 1100px; height: 380px; cursor: pointer; }
+.flip-inner {
+  width: 100%; height: 100%; position: relative;
+  transform-style: preserve-3d; transition: transform .75s cubic-bezier(.4,0,.2,1);
+}
+.flip-card:hover .flip-inner { transform: rotateY(180deg); }
+.flip-face {
+  position: absolute; inset: 0; border-radius: var(--r2);
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  padding: 36px; border: 1px solid var(--border);
+}
+.flip-front {
+  display: flex; flex-direction: column; justify-content: flex-end;
+  background: var(--surface); overflow: hidden;
+}
+.flip-front-bg {
+  position: absolute; inset: 0; border-radius: var(--r2);
+  opacity: 0.55;
+}
+.p1 .flip-front-bg { background: radial-gradient(ellipse at 80% 20%, rgba(59,130,246,0.4), transparent 60%); }
+.p2 .flip-front-bg { background: radial-gradient(ellipse at 80% 20%, rgba(236,72,153,0.4), transparent 60%); }
+.p3 .flip-front-bg { background: radial-gradient(ellipse at 80% 20%, rgba(16,185,129,0.4), transparent 60%); }
+.flip-front::after {
+  content: ''; position: absolute; inset: 0; border-radius: var(--r2);
+  background: linear-gradient(to top, rgba(6,13,26,0.9) 0%, transparent 60%);
+}
+.flip-front-icon {
+  position: absolute; top: 28px; right: 24px; font-size: 3.8rem;
+  filter: drop-shadow(0 0 18px currentColor); z-index: 1;
+}
+.p1 .flip-front-icon { color: var(--blue2); }
+.p2 .flip-front-icon { color: var(--pink2); }
+.p3 .flip-front-icon { color: var(--green2); }
+.flip-front-content { position: relative; z-index: 1; }
+.flip-num { font-family: var(--ff-mono); font-size: 0.62rem; letter-spacing: 0.15em; color: var(--text-3); margin-bottom: 8px; }
+.flip-title { font-family: var(--ff-head); font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; }
+.flip-sub { font-size: 0.78rem; color: var(--text-2); }
+.flip-hint { font-family: var(--ff-mono); font-size: 0.58rem; color: var(--text-3); margin-top: 14px; letter-spacing: 0.1em; }
+
+.flip-back {
+  transform: rotateY(180deg); background: var(--surface);
+  display: flex; flex-direction: column; justify-content: center; gap: 14px;
+}
+.p1.flip-card:hover { box-shadow: 0 0 50px rgba(59,130,246,0.2); }
+.p2.flip-card:hover { box-shadow: 0 0 50px rgba(236,72,153,0.2); }
+.p3.flip-card:hover { box-shadow: 0 0 50px rgba(16,185,129,0.2); }
+.flip-back h4 { font-family: var(--ff-head); font-size: 0.95rem; font-weight: 700; margin-bottom: 6px; }
+.flip-back p { font-size: 0.88rem; color: var(--text-2); line-height: 1.8; }
+.flip-back .cite { margin-top: 14px; display: block; }
+
+/* ─── SENSOR ─────────────────────────────────── */
+#sensor { background: var(--bg2); }
+.sensor-demo {
+  max-width: 720px; margin: 0 auto;
+  padding: 70px 56px; border-radius: 32px; text-align: center; cursor: default;
+  position: relative; overflow: hidden;
+  border: 2px solid var(--blue);
+  background: linear-gradient(135deg, rgba(59,130,246,0.16), rgba(59,130,246,0.04));
+  box-shadow: 0 0 80px rgba(59,130,246,0.18), 0 0 200px rgba(59,130,246,0.05);
+  transition: all .45s cubic-bezier(.4,0,.2,1);
+  user-select: none;
+}
+.sensor-demo:hover {
+  border-color: var(--pink);
+  background: linear-gradient(135deg, rgba(236,72,153,0.28), rgba(236,72,153,0.06));
+  box-shadow: 0 0 80px rgba(236,72,153,0.28), 0 0 200px rgba(236,72,153,0.08);
+}
+.sensor-demo::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(59,130,246,0.12), transparent 60%);
+  transition: all .45s;
+}
+.sensor-demo:hover::before {
+  background: radial-gradient(circle at 50% 0%, rgba(236,72,153,0.18), transparent 60%);
+}
+
+/* animated molecular ring */
+.mol-visual { width: 100px; height: 100px; margin: 0 auto 28px; position: relative; }
+.mol-outer {
+  width: 100px; height: 100px; border-radius: 50%;
+  border: 2.5px solid var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 20px var(--blue-g);
+  transition: all .45s;
+  animation: mol-stable 3s ease-in-out infinite;
+}
+.sensor-demo:hover .mol-outer {
+  border-color: var(--pink); border-radius: 40% 60% 70% 30% / 50% 30% 70% 50%;
+  box-shadow: 0 0 28px var(--pink-g);
+  animation: mol-agitate .7s ease-in-out infinite alternate;
+}
+@keyframes mol-stable { 0%,100%{box-shadow:0 0 20px var(--blue-g)} 50%{box-shadow:0 0 32px rgba(59,130,246,0.5)} }
+@keyframes mol-agitate {
+  to { border-radius: 60% 40% 30% 70% / 70% 50% 50% 30%; transform: rotate(12deg) scale(1.08); }
+}
+.mol-inner {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--blue); opacity: 0.55; transition: all .45s;
+}
+.sensor-demo:hover .mol-inner { background: var(--pink); border-radius: 30% 70% 60% 40% / 40% 60% 40% 60%; opacity: 0.75; }
+
+.sensor-ph {
+  font-family: var(--ff-mono); font-size: 4.5rem; font-weight: 500;
+  color: rgba(59,130,246,0.8); line-height: 1; margin-bottom: 12px;
+  transition: color .45s; letter-spacing: -0.02em;
+}
+.sensor-demo:hover .sensor-ph { color: rgba(236,72,153,0.9); }
+
+.sensor-status {
+  font-family: var(--ff-head); font-size: clamp(1.3rem, 2.5vw, 2rem);
+  font-weight: 800; color: var(--blue2); margin-bottom: 12px; transition: color .45s;
+}
+.sensor-demo:hover .sensor-status { color: var(--pink2); }
+
+.sensor-sub { font-size: 0.88rem; color: var(--text-2); transition: color .45s; margin-bottom: 24px; }
+.sensor-demo:hover .sensor-sub { color: rgba(236,72,153,0.7); }
+
+.sensor-code {
+  display: inline-block; padding: 10px 22px; border-radius: 8px;
+  font-family: var(--ff-mono); font-size: 0.7rem; letter-spacing: 0.08em;
+  background: rgba(0,0,0,0.3); color: var(--text-3); border: 1px solid var(--border);
+  transition: color .45s, border-color .45s;
+}
+.sensor-demo:hover .sensor-code { color: rgba(236,72,153,0.5); border-color: rgba(236,72,153,0.2); }
+
+.sensor-legend {
+  display: flex; gap: 32px; justify-content: center; margin-top: 28px;
+}
+.legend-item { display: flex; align-items: center; gap: 9px; font-size: 0.8rem; color: var(--text-2); }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ─── MOLECULAR ─────────────────────────────── */
+#molecular {}
+.mol-section-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+.mol-text h2 { margin-bottom: 14px; }
+.mol-text p { font-size: 0.93rem; color: var(--text-2); line-height: 1.85; margin-bottom: 18px; }
+.mol-text .cite { display: block; margin-top: 8px; }
+
+.mol-diagram {
+  padding: 40px; border-radius: var(--r2);
+  background: var(--surface); border: 1px solid var(--border);
+  display: flex; flex-direction: column; gap: 24px; align-items: center;
+}
+.mol-states { display: flex; gap: 20px; align-items: center; justify-content: center; width: 100%; }
+.mol-state { text-align: center; flex: 1; }
+.mol-svg-wrap { margin: 0 auto 12px; }
+.mol-state-label { font-family: var(--ff-mono); font-size: 0.62rem; letter-spacing: 0.1em; margin-top: 8px; }
+.mol-arrow { font-size: 1.6rem; color: var(--text-3); flex-shrink: 0; }
+.mol-detail { width: 100%; padding: 16px 20px; border-radius: var(--r); background: rgba(0,0,0,0.2); font-size: 0.82rem; color: var(--text-2); line-height: 1.75; }
+
+/* ─── FABRIKASI ─────────────────────────────── */
+#fabrikasi { background: var(--bg2); }
+.fab-timeline { position: relative; max-width: 800px; margin: 0 auto; }
+.fab-line {
+  position: absolute; left: 32px; top: 0; bottom: 0; width: 2px;
+  background: var(--border);
+}
+.fab-progress {
+  position: absolute; left: 0; top: 0; width: 100%; height: 0%;
+  background: linear-gradient(to bottom, var(--blue), var(--green));
+  transition: height .5s ease;
+}
+.fab-item {
+  display: flex; gap: 40px; margin-bottom: 56px; position: relative; align-items: flex-start;
+}
+.fab-item:last-child { margin-bottom: 0; }
+.fab-dot {
+  width: 64px; height: 64px; border-radius: 50%; flex-shrink: 0;
+  background: var(--bg2); border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem; position: relative; z-index: 1;
+  transition: border-color .4s, box-shadow .4s, background .4s;
+}
+.fab-item.lit .fab-dot {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 6px rgba(59,130,246,0.12), 0 0 24px var(--blue-g);
+  background: linear-gradient(135deg, rgba(59,130,246,0.18), var(--bg2));
+}
+.fab-body { padding-top: 10px; }
+.fab-step { font-family: var(--ff-mono); font-size: 0.62rem; letter-spacing: 0.15em; color: var(--blue); margin-bottom: 8px; }
+.fab-body h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 10px; }
+.fab-body p { font-size: 0.9rem; color: var(--text-2); line-height: 1.82; }
+.fab-body .cite { display: block; margin-top: 10px; }
+
+/* ─── PENGUJIAN ─────────────────────────────── */
+#pengujian {}
+.peng-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+.peng-card {
+  padding: 34px 28px; border-radius: var(--r2);
+  background: var(--surface); border: 1px solid var(--border);
+  position: relative; overflow: hidden;
+  transition: transform .35s, box-shadow .35s, border-color .35s;
+  cursor: default;
+}
+.peng-card::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--blue), var(--green));
+  transform: scaleX(0); transform-origin: left; transition: transform .4s;
+}
+.peng-card:hover { transform: translateY(-7px); box-shadow: 0 24px 60px rgba(59,130,246,0.13); border-color: rgba(59,130,246,0.3); }
+.peng-card:hover::after { transform: scaleX(1); }
+.peng-icon { font-size: 2.2rem; margin-bottom: 20px; }
+.peng-card h3 { font-size: 0.98rem; font-weight: 700; margin-bottom: 12px; }
+.peng-card p { font-size: 0.87rem; color: var(--text-2); line-height: 1.8; }
+
+/* ─── FAQ ───────────────────────────────────── */
+#faq { background: var(--bg2); }
+.faq-wrap { max-width: 820px; }
+.faq-item {
+  border: 1px solid var(--border); border-radius: var(--r2);
+  margin-bottom: 14px; overflow: hidden; transition: border-color .3s;
+}
+.faq-item.open { border-color: rgba(59,130,246,0.4); }
+.faq-q {
+  padding: 22px 28px;
+  display: flex; justify-content: space-between; align-items: center; gap: 20px;
+  cursor: pointer; background: var(--surface); transition: background .3s;
+}
+.faq-q:hover { background: rgba(59,130,246,0.05); }
+.faq-q-text { font-family: var(--ff-head); font-size: 0.96rem; font-weight: 600; line-height: 1.4; }
+.faq-ico {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  border: 1px solid var(--border-hi); color: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; transition: transform .4s, background .3s, border-color .3s;
+}
+.faq-item.open .faq-ico { transform: rotate(45deg); background: var(--blue-d); border-color: var(--blue); }
+.faq-body { max-height: 0; overflow: hidden; transition: max-height .55s cubic-bezier(.4,0,.2,1); }
+.faq-item.open .faq-body { max-height: 400px; }
+.faq-inner { padding: 4px 28px 26px; font-size: 0.9rem; color: var(--text-2); line-height: 1.85; }
+
+/* ─── REFERENSI ─────────────────────────────── */
+#referensi {}
+.ref-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; }
+.ref-item {
+  padding: 22px 26px; border-radius: var(--r);
+  background: var(--surface); border: 1px solid var(--border);
+  transition: border-color .3s, transform .3s;
+}
+.ref-item:hover { border-color: rgba(59,130,246,0.3); transform: translateX(4px); }
+.ref-author { font-family: var(--ff-mono); font-size: 0.65rem; color: var(--blue); letter-spacing: 0.08em; margin-bottom: 6px; }
+.ref-title { font-size: 0.88rem; font-weight: 600; margin-bottom: 6px; line-height: 1.4; }
+.ref-journal { font-size: 0.8rem; color: var(--text-3); font-style: italic; }
+
+/* ─── FOOTER ────────────────────────────────── */
+footer {
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 56px 6vw;
+}
+.footer-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 24px;
+}
+.footer-brand-name {
+  font-family: var(--ff-head); font-weight: 900; font-size: 1.6rem;
+  background: linear-gradient(110deg, var(--blue2), var(--green2));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+}
+.footer-tagline { font-family: var(--ff-serif); font-style: italic; font-size: 0.88rem; color: var(--text-3); }
+.footer-copy { font-size: 0.78rem; color: var(--text-3); }
+
+/* SDG BADGES ─────────────── */
+#sdgs {}
+.sdg-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; }
+.sdg-card {
+  padding: 38px 30px; border-radius: var(--r2); text-align: center;
+  background: var(--surface); border: 1px solid var(--border);
+  transition: transform .35s, box-shadow .35s;
+  cursor: default; position: relative; overflow: hidden;
+}
+.sdg-card::before {
+  content: ''; position: absolute; inset: 0; border-radius: var(--r2);
+  opacity: 0; transition: opacity .35s;
+}
+.sdg-1::before { background: radial-gradient(circle at 50% 0%, rgba(16,185,129,0.15), transparent 60%); }
+.sdg-2::before { background: radial-gradient(circle at 50% 0%, rgba(59,130,246,0.15), transparent 60%); }
+.sdg-3::before { background: radial-gradient(circle at 50% 0%, rgba(236,72,153,0.15), transparent 60%); }
+.sdg-card:hover { transform: translateY(-8px) scale(1.02); }
+.sdg-card:hover::before { opacity: 1; }
+.sdg-1:hover { box-shadow: 0 24px 60px rgba(16,185,129,0.2); border-color: rgba(16,185,129,0.35); }
+.sdg-2:hover { box-shadow: 0 24px 60px rgba(59,130,246,0.2); border-color: rgba(59,130,246,0.35); }
+.sdg-3:hover { box-shadow: 0 24px 60px rgba(236,72,153,0.2); border-color: rgba(236,72,153,0.35); }
+.sdg-num {
+  font-family: var(--ff-head); font-size: 3.8rem; font-weight: 900; line-height: 1;
+  margin-bottom: 8px; position: relative; z-index: 1;
+}
+.sdg-1 .sdg-num { color: var(--green2); text-shadow: 0 0 28px var(--green-g); }
+.sdg-2 .sdg-num { color: var(--blue2); text-shadow: 0 0 28px var(--blue-g); }
+.sdg-3 .sdg-num { color: var(--pink2); text-shadow: 0 0 28px var(--pink-g); }
+.sdg-title { font-family: var(--ff-head); font-size: 0.92rem; font-weight: 700; margin-bottom: 10px; position: relative; z-index: 1; }
+.sdg-body { font-size: 0.84rem; color: var(--text-2); line-height: 1.7; position: relative; z-index: 1; }
+
+/* RESPONSIVE */
+@media (max-width: 1080px) {
+  .hero-wrap { grid-template-columns: 1fr; }
+  .hero-visual { display: none; }
+  .mol-section-wrap { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+  .krisis-grid, .pilar-grid, .peng-grid, .sdg-row, .ref-grid { grid-template-columns: 1fr; }
+  .counters { grid-template-columns: 1fr; }
+  .hero-stats { flex-direction: column; }
+  .hero-stat { border-right: none; border-bottom: 1px solid var(--border); }
+  .hero-stat:last-child { border-bottom: none; }
+  .nav-links, .nav-cta { display: none; }
+}
+
+/* noise overlay */
+body::after {
+  content: ''; position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.018;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ══════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="nav-logo">MYSTERO</div>
+  <ul class="nav-links">
+    <li><a href="#krisis">Krisis</a></li>
+    <li><a href="#pilar">Inovasi</a></li>
+    <li><a href="#sensor">Sensor</a></li>
+    <li><a href="#fabrikasi">Fabrikasi</a></li>
+    <li><a href="#sdgs">SDGs</a></li>
+    <li><a href="#faq">FAQ</a></li>
+    <li><a href="#referensi">Pustaka</a></li>
+  </ul>
+  <button class="nav-cta" onclick="document.getElementById('sensor').scrollIntoView({behavior:'smooth'})">Live Demo →</button>
+</nav>
+
+<!-- ═══ HERO ══════════════════════════════════════ -->
+<section id="hero">
+  <div class="hero-layer hero-layer-1"></div>
+  <div class="hero-layer hero-grid"></div>
+
+  <div class="hero-wrap">
+    <div class="hero-text">
+      <div class="hero-eyebrow rv">
+        <div class="hero-eyebrow-line"></div>
+        <span class="hero-eyebrow-text">International Award-Winning Biotech Project · 2026</span>
+      </div>
+      <h1 class="rv">
+        <span class="h1-blue">MYSTERO</span><br>
+        Mycelium Smart<br>
+        Threat-Evaluating &<br>
+        Regrowing Organic-box
+      </h1>
+      <p class="hero-tagline rv">"Detects the bad, <strong>grows the good.</strong>"</p>
+      <p class="hero-desc rv">
+        Inovasi mutakhir wadah makanan biodegradable yang merevolusi industri pengemasan. Dicetak dari komposit matriks miselium jamur dan limbah serbuk gergaji, MYSTERO hadir sebagai solusi cerdas yang mengintegrasikan keamanan pangan, keberlanjutan ekologi, dan ekonomi sirkular dalam satu desain biomaterial struktural.
+      </p>
+      <div class="hero-actions rv">
+        <a href="#pilar" class="btn btn-primary">Jelajahi Teknologi →</a>
+        <a href="#sensor" class="btn btn-outline">Simulasi Sensor</a>
+      </div>
+    </div>
+
+    <div class="hero-visual rv2">
+      <div class="hero-box-scene">
+        <div class="hero-box-3d">
+          <div class="orbit orbit-1"><div class="orbit-dot orbit-dot-1"></div></div>
+          <div class="orbit orbit-2"><div class="orbit-dot orbit-dot-2"></div></div>
+          <div class="orbit orbit-3"><div class="orbit-dot orbit-dot-3"></div></div>
+          <div class="box-face box-front">
+            <div class="box-icon">🍄</div>
+            <div class="box-label">MYCO-COMPOSITE<br>SMART PACKAGING</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-stats rv">
+    <div class="hero-stat">
+      <div class="hero-stat-val" data-target="500" data-suffix="+ Tahun">0</div>
+      <div class="hero-stat-label">Waktu urai styrofoam vs. minggu untuk MYSTERO</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val" data-target="1.3" data-suffix=" Miliar Ton" data-float="1">0</div>
+      <div class="hero-stat-label">Limbah makanan global per tahun</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val" data-target="30" data-suffix="–45 Hari">0</div>
+      <div class="hero-stat-label">Degradasi penuh MYSTERO di tanah</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hero-stat-val" data-target="100" data-suffix="% Food Grade">0</div>
+      <div class="hero-stat-label">Keamanan pangan pasca-inaktivasi termal</div>
+    </div>
+  </div>
+
+  <div class="scroll-ind" onclick="document.getElementById('krisis').scrollIntoView({behavior:'smooth'})">
+    SCROLL
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M12 5v14M5 12l7 7 7-7"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ═══ KRISIS ══════════════════════════════════════ -->
+<section id="krisis">
+  <div class="sec-tag rv">02 — Latar Belakang</div>
+  <h2 class="rv">Krisis Global yang <span style="color:var(--pink2)">Mendesak Solusi</span></h2>
+  <p class="lead rv">Dua ancaman paralel — polusi material sintetis dan kegagalan sistem deteksi keamanan pangan — yang melahirkan urgensi MYSTERO.</p>
+
+  <div class="krisis-grid">
+    <div class="krisis-card rv">
+      <div class="kc-icon">☣️</div>
+      <div class="kc-title">Krisis Polistirena & Toksisitas</div>
+      <p class="kc-body">Dunia menghadapi krisis ekologis akut akibat polistirena (styrofoam) yang membutuhkan waktu lebih dari <strong>500 tahun</strong> untuk terurai di alam bebas (Holt, dkk., 2012). Lebih parah lagi, penggunaan styrofoam pada makanan bersuhu tinggi berisiko melepaskan monomer stirena, sebuah residu kimia karsinogenik yang dapat bermigrasi ke dalam makanan dan membahayakan sistem saraf serta organ vital manusia.</p>
+      <span class="cite">Holt, G. A., dkk. (2012). Journal of Biobased Materials and Bioenergy, 6(4), 431–439.</span>
+    </div>
+    <div class="krisis-card rv2">
+      <div class="kc-icon">🦠</div>
+      <div class="kc-title">Bahaya Tersembunyi Pembusukan Pangan</div>
+      <p class="kc-body">Isu keamanan pangan global mencatat tingginya kasus keracunan akibat konsumsi makanan yang telah mengalami degradasi kualitas. Pembusukan terjadi ketika mikroorganisme patogen memecah rantai karbohidrat dan protein, secara masif melepaskan senyawa asam seperti <strong>asam laktat</strong> dan gas amonia (Ray & Bhunia, 2013). Konsumen sering terkelabui karena pada fase awal pembusukan, perubahan aroma dan rasa belum mencapai ambang batas deteksi sensorik manusia.</p>
+      <span class="cite">Ray, B., & Bhunia, A. (2013). Fundamental Food Microbiology (5th ed.). CRC Press.</span>
+    </div>
+  </div>
+
+  <div class="counters">
+    <div class="counter-box rv">
+      <div class="cnt-val" data-target="500" data-suffix=" Tahun">0</div>
+      <div class="cnt-lbl">Waktu Urai Styrofoam di Alam Bebas</div>
+    </div>
+    <div class="counter-box rv2">
+      <div class="cnt-val" data-target="1.3" data-suffix=" Miliar Ton" data-float="1">0</div>
+      <div class="cnt-lbl">Limbah Makanan Global per Tahun (FAO)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PILAR ══════════════════════════════════════ -->
+<section id="pilar">
+  <div class="sec-tag rv">03 — Inti Teknologi</div>
+  <h2 class="rv">Tiga Pilar Inovasi <span style="color:var(--blue2)">Bioteknologi</span></h2>
+  <p class="lead rv">Hover pada setiap kartu untuk membuka detail sains akademis di balik masing-masing komponen teknologi MYSTERO.</p>
+
+  <div class="pilar-grid">
+    <!-- Pilar 1 -->
+    <div class="flip-card p1 rv">
+      <div class="flip-inner">
+        <div class="flip-face flip-front">
+          <div class="flip-front-bg"></div>
+          <div class="flip-front-icon">🍄</div>
+          <div class="flip-front-content">
+            <div class="flip-num">PILLAR 01</div>
+            <div class="flip-title">Myco-Composite Body</div>
+            <div class="flip-sub">Struktur Biomaterial Utama</div>
+            <div class="flip-hint">// HOVER UNTUK DETAIL ILMIAH //</div>
+          </div>
+        </div>
+        <div class="flip-face flip-back">
+          <h4>🍄 Myco-Composite Body</h4>
+          <p>Berlandaskan teori fundamental Paul Stamets (2005), miselium memproduksi enzim ekstraseluler untuk mencerna selulosa dan lignin, sekaligus membentuk jaringan hifa yang mengandung kitin. Matriks kitin ini bertindak sebagai resin biologis alami dengan kekuatan kompresi yang setara dengan styrofoam konvensional, menjadikannya alternatif struktural yang sangat tangguh, ringan, dan memiliki insulasi termal superior.</p>
+          <span class="cite">Stamets, P. (2005). Mycelium Running: How Mushrooms Can Help Save the World. Ten Speed Press.</span>
+        </div>
+      </div>
+    </div>
+    <!-- Pilar 2 -->
+    <div class="flip-card p2 rv2">
+      <div class="flip-inner">
+        <div class="flip-face flip-front">
+          <div class="flip-front-bg"></div>
+          <div class="flip-front-icon">💜</div>
+          <div class="flip-front-content">
+            <div class="flip-num">PILLAR 02</div>
+            <div class="flip-title">Intelligent Anthocyanin Sensor</div>
+            <div class="flip-sub">Sistem Deteksi pH Cerdas</div>
+            <div class="flip-hint">// HOVER UNTUK DETAIL ILMIAH //</div>
+          </div>
+        </div>
+        <div class="flip-face flip-back">
+          <h4>💜 Intelligent Anthocyanin Sensor</h4>
+          <p>Mengadaptasi penelitian Chu, dkk. (2016), MYSTERO mengintegrasikan pigmen antosianin dari ekstrak Bunga Telang (<em>Clitoria ternatea</em>) sebagai indikator pengemasan cerdas <em>(intelligent packaging)</em>. Sensor visual ini sangat responsif terhadap fluktuasi pH lingkungan mikro di dalam kemasan, memberikan peringatan visual seketika kepada konsumen.</p>
+          <span class="cite">Chu, B. S., dkk. (2016). Anthocyanins as pH-responsive intelligent packaging indicators. Food Control.</span>
+        </div>
+      </div>
+    </div>
+    <!-- Pilar 3 -->
+    <div class="flip-card p3 rv3">
+      <div class="flip-inner">
+        <div class="flip-face flip-front">
+          <div class="flip-front-bg"></div>
+          <div class="flip-front-icon">🌱</div>
+          <div class="flip-front-content">
+            <div class="flip-num">PILLAR 03</div>
+            <div class="flip-title">Ecological Regrowing System</div>
+            <div class="flip-sub">Regenerasi Kehidupan Zero-Waste</div>
+            <div class="flip-hint">// HOVER UNTUK DETAIL ILMIAH //</div>
+          </div>
+        </div>
+        <div class="flip-face flip-back">
+          <h4>🌱 Ecological Regrowing System</h4>
+          <p>Sesuai prinsip regenerasi ilmu tanah oleh Magdoff & Van Es (2021), lapisan eksterior MYSTERO dilengkapi seed bomb tersuspensi. Saat dikubur, miselium terurai menjadi kompos kaya nitrogen dan karbon, memperbaiki porositas tanah, dan memberikan nutrisi makro yang memicu perkecambahan biji tanaman secara mandiri (Zero-Waste).</p>
+          <span class="cite">Magdoff, F., & Van Es, H. (2021). Building Soils for Better Crops. SARE.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SENSOR ══════════════════════════════════════ -->
+<section id="sensor">
+  <div class="sec-tag rv">04 — Demo Interaktif</div>
+  <h2 class="rv">Simulasi Sensor <span style="color:var(--pink2)">Cerdas</span></h2>
+  <p class="lead rv">Arahkan kursor ke panel berikut untuk mensimulasikan respons sensor antosianin saat mendeteksi perubahan pH akibat pembusukan makanan.</p>
+
+  <div class="sensor-demo rv">
+    <div class="mol-visual">
+      <div class="mol-outer"><div class="mol-inner"></div></div>
+    </div>
+    <div class="sensor-ph">pH 7.0</div>
+    <div class="sensor-status">Kondisi Aman (pH Netral)</div>
+    <div class="sensor-sub">Struktur antosianin basa quinonoidal stabil — tidak ada gas asam terdeteksi</div>
+    <div class="sensor-code">// HOVER → SIMULASI ASAM LAKTAT TERDETEKSI //</div>
+  </div>
+
+  <div class="sensor-legend rv">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--blue);box-shadow:0 0 8px var(--blue-g)"></div>
+      <span>pH Netral (≥6) — Makanan Segar</span>
+    </div>
+    <div class="legend-dot" style="width:1px;height:20px;background:var(--border);border-radius:0"></div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--pink);box-shadow:0 0 8px var(--pink-g)"></div>
+      <span>pH Asam (≤5) — BAHAYA: Asam Laktat Terdeteksi (Basi)</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ MOLECULAR ══════════════════════════════════════ -->
+<section id="molecular">
+  <div class="sec-tag rv">05 — Mekanisme Sains</div>
+  <div class="mol-section-wrap">
+    <div class="mol-text">
+      <h2 class="rv">Mekanisme Molekuler <span style="color:var(--blue2)">Sensor Cerdas</span></h2>
+      <p class="rv">Sifat molekular antosianin sangat tidak stabil terhadap paparan ion hidrogen (Chu, dkk., 2016). Pada kondisi makanan segar (pH netral), struktur molekul berada dalam bentuk <strong>basa quinonoidal</strong> yang memancarkan warna biru pekat.</p>
+      <p class="rv2">Namun, saat patogen mulai aktif dan menurunkan pH lingkungan melalui produksi asam, terjadi reaksi <strong>protonasi</strong> menjadi kation flavylium. Perubahan struktur ikatan ganda ini menggeser spektrum absorpsi cahaya secara instan, mengubah warna wadah menjadi <strong>merah muda hingga ungu kemerahan</strong> (Ray & Bhunia, 2013).</p>
+      <span class="cite rv3">Chu, B. S., dkk. (2016). Food Control. / Ray, B., & Bhunia, A. (2013). CRC Press.</span>
+    </div>
+    <div class="mol-diagram rv2">
+      <div class="mol-states">
+        <div class="mol-state">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle cx="55" cy="55" r="44" fill="none" stroke="#3b82f6" stroke-width="2.5" opacity="0.75"/>
+            <circle cx="55" cy="55" r="26" fill="none" stroke="#3b82f6" stroke-width="2" opacity="0.45"/>
+            <circle cx="55" cy="55" r="11" fill="#3b82f6" opacity="0.55"/>
+            <line x1="55" y1="11" x2="55" y2="29" stroke="#3b82f6" stroke-width="2"/>
+            <line x1="55" y1="81" x2="55" y2="99" stroke="#3b82f6" stroke-width="2"/>
+            <line x1="11" y1="55" x2="29" y2="55" stroke="#3b82f6" stroke-width="2"/>
+            <line x1="81" y1="55" x2="99" y2="55" stroke="#3b82f6" stroke-width="2"/>
+            <circle cx="55" cy="11" r="4.5" fill="#60a5fa"/>
+            <circle cx="55" cy="99" r="4.5" fill="#60a5fa"/>
+            <circle cx="11" cy="55" r="4.5" fill="#60a5fa"/>
+            <circle cx="99" cy="55" r="4.5" fill="#60a5fa"/>
+            <text x="55" y="59" text-anchor="middle" fill="#93c5fd" font-size="9" font-family="monospace">STABLE</text>
+          </svg>
+          <div class="mol-state-label" style="color:var(--blue)">QUINONOIDAL<br>pH ≥ 6 · Biru</div>
+        </div>
+        <div class="mol-arrow">→</div>
+        <div class="mol-state">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <ellipse cx="55" cy="55" rx="46" ry="33" fill="none" stroke="#ec4899" stroke-width="2.5" opacity="0.8">
+              <animate attributeName="rx" values="46;38;46" dur="1.1s" repeatCount="indefinite"/>
+              <animate attributeName="ry" values="33;44;33" dur="1.1s" repeatCount="indefinite"/>
+            </ellipse>
+            <ellipse cx="55" cy="55" rx="24" ry="17" fill="none" stroke="#ec4899" stroke-width="2" opacity="0.5">
+              <animate attributeName="rx" values="24;18;24" dur="0.9s" repeatCount="indefinite"/>
+              <animate attributeName="ry" values="17;24;17" dur="0.9s" repeatCount="indefinite"/>
+            </ellipse>
+            <circle cx="55" cy="55" r="10" fill="#ec4899" opacity="0.7">
+              <animate attributeName="r" values="10;13;10" dur="0.7s" repeatCount="indefinite"/>
+            </circle>
+            <line x1="55" y1="9" x2="44" y2="28" stroke="#ec4899" stroke-width="2"/>
+            <line x1="55" y1="101" x2="68" y2="86" stroke="#ec4899" stroke-width="2"/>
+            <line x1="9" y1="48" x2="29" y2="53" stroke="#ec4899" stroke-width="2"/>
+            <line x1="101" y1="65" x2="82" y2="59" stroke="#ec4899" stroke-width="2"/>
+            <circle cx="44" cy="28" r="4.5" fill="#f472b6"><animate attributeName="r" values="4.5;6.5;4.5" dur="0.6s" repeatCount="indefinite"/></circle>
+            <circle cx="68" cy="86" r="4.5" fill="#f472b6"/>
+            <circle cx="9"  cy="48" r="4.5" fill="#f472b6"/>
+            <circle cx="101" cy="65" r="4.5" fill="#f472b6"><animate attributeName="r" values="4.5;6.5;4.5" dur="0.9s" repeatCount="indefinite"/></circle>
+            <text x="55" y="59" text-anchor="middle" fill="#f9a8d4" font-size="8" font-family="monospace">PROTONATED</text>
+          </svg>
+          <div class="mol-state-label" style="color:var(--pink)">KATION FLAVYLIUM<br>pH ≤ 5 · Merah-Ungu</div>
+        </div>
+      </div>
+      <div class="mol-detail">
+        <strong>Reaksi Protonasi:</strong> Antosianin + H⁺ → Kation Flavylium. Pergeseran ikatan ganda konjugat pada inti kromenilium mengubah panjang gelombang absorpsi maksimum dari ~620 nm (biru) ke ~520 nm (merah muda), menciptakan peringatan visual instan yang dapat dilihat mata telanjang.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FABRIKASI ══════════════════════════════════════ -->
+<section id="fabrikasi">
+  <div class="sec-tag rv">06 — Metodologi</div>
+  <h2 class="rv">Metodologi Fabrikasi <span style="color:var(--green2)">Terukur</span></h2>
+  <p class="lead rv">Empat tahap saintifik yang mengubah limbah agro-industri menjadi wadah biomaterial berteknologi tinggi berstandar Food Grade.</p>
+
+  <div class="fab-timeline">
+    <div class="fab-line"><div class="fab-progress" id="fab-prog"></div></div>
+
+    <div class="fab-item rv" data-fi="0">
+      <div class="fab-dot">🔥</div>
+      <div class="fab-body">
+        <div class="fab-step">TAHAP 01 — PREPARASI & PASTEURISASI</div>
+        <h3>Sterilisasi Substrat Organik</h3>
+        <p>Substrat utama yang terdiri dari <strong>1.000 gram serbuk gergaji kayu murni</strong> dan <strong>200 gram dedak</strong> dicampur hingga homogen dengan kelembapan 60–65%. Substrat kemudian disterilisasi menggunakan pemanasan uap bersuhu <strong>100°C selama 120 menit</strong> untuk mengeliminasi total mikroorganisme kontaminan.</p>
+        <span class="cite">Holt, G. A., dkk. (2012). Journal of Biobased Materials and Bioenergy, 6(4), 431–439.</span>
+      </div>
+    </div>
+
+    <div class="fab-item rv" data-fi="1">
+      <div class="fab-dot">🧬</div>
+      <div class="fab-body">
+        <div class="fab-step">TAHAP 02 — INOKULASI & INKUBASI</div>
+        <h3>Kolonisasi Jaringan Hifa Miselium</h3>
+        <p>Setelah suhu substrat turun mencapai suhu ruang absolut (± 27°C), bibit jamur tiram putih (F2) diinokulasikan dalam lingkungan aseptik. Substrat dipadatkan ke dalam cetakan polipropilena dan diinkubasi di ruang gelap selama <strong>7 hari</strong> hingga jaringan hifa merajut seluruh matriks organik secara sempurna.</p>
+        <span class="cite">Stamets, P. (2005). Mycelium Running. Ten Speed Press.</span>
+      </div>
+    </div>
+
+    <div class="fab-item rv" data-fi="2">
+      <div class="fab-dot">⚗️</div>
+      <div class="fab-body">
+        <div class="fab-step">TAHAP 03 — INAKTIVASI TERMAL (PENGHENTIAN VEGETATIF)</div>
+        <h3>Fiksasi Material Menjadi Inert Food Grade</h3>
+        <p>Purwarupa dikeluarkan dari cetakan dan menjalani proses dehidrasi termal di dalam oven pada spesifikasi suhu <strong>80°C – 90°C selama 120 menit</strong>. Proses ini krusial untuk mematikan sel vegetatif jamur secara permanen, sehingga material menjadi inert dan sangat aman bersentuhan dengan makanan.</p>
+        <span class="cite">Holt, G. A., dkk. (2012). Journal of Biobased Materials and Bioenergy, 6(4), 431–439.</span>
+      </div>
+    </div>
+
+    <div class="fab-item rv" data-fi="3">
+      <div class="fab-dot">🎨</div>
+      <div class="fab-body">
+        <div class="fab-step">TAHAP 04 — APLIKASI SISTEM CERDAS (COATING)</div>
+        <h3>Integrasi Sensor & Seed Bomb</h3>
+        <p>Ekstraksi antosianin bunga telang dilarutkan dengan biopolimer agar-agar murni, lalu diaplikasikan secara merata pada <strong>dinding interior</strong>. Sementara itu, suspensi biji tanaman hortikultura yang direkatkan menggunakan gelatinisasi tepung tapioka diaplikasikan pada <strong>dinding eksterior</strong>.</p>
+        <span class="cite">Marpaung, A. M., dkk. (2015). Jurnal Teknologi dan Industri Pangan.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ PENGUJIAN ══════════════════════════════════════ -->
+<section id="pengujian">
+  <div class="sec-tag rv">07 — Validasi Empiris</div>
+  <h2 class="rv">Pengujian dan <span style="color:var(--green2)">Evaluasi Data</span></h2>
+  <p class="lead rv">Tiga protokol uji kuantitatif independen untuk memvalidasi performa, keamanan, dan biodegradabilitas MYSTERO secara ilmiah.</p>
+
+  <div class="peng-grid">
+    <div class="peng-card rv">
+      <div class="peng-icon">🔬</div>
+      <h3>Uji Presisi Respons Indikator<br>(Sensor pH)</h3>
+      <p>Simulasi pembusukan dilakukan melalui penetesan asam asetat buatan pada permukaan interior wadah. Pencatatan difokuskan pada sensitivitas durasi waktu respons dan akurasi pergeseran spektrum warna dari biru menjadi ungu/kemerahan di bawah observasi fotometrik.</p>
+    </div>
+    <div class="peng-card rv2">
+      <div class="peng-icon">🌱</div>
+      <h3>Uji Viabilitas Perkecambahan<br>(Biodegradasi)</h3>
+      <p>Purwarupa MYSTERO ditanam di dalam media tanah humus dengan parameter kelembapan terkendali. Pencatatan dilakukan untuk mengukur waktu countdown hari pertama biji bertunas, laju pelunakan material komposit, hingga integrasi total material menjadi tanah.</p>
+    </div>
+    <div class="peng-card rv3">
+      <div class="peng-icon">💧</div>
+      <h3>Uji Resistansi dan<br>Permeabilitas Cairan</h3>
+      <p>Evaluasi kelayakan fungsional dilakukan dengan menuangkan cairan bersuhu ruang ke dalam MYSTERO. Observasi difokuskan pada ketahanan lapisan biopolimer agar-agar dalam menutup porositas miselium, menguji pencegahan kebocoran secara berkelanjutan selama 120 menit.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ SDGs ══════════════════════════════════════ -->
+<section id="sdgs">
+  <div class="sec-tag rv">08 — Dampak Global</div>
+  <h2 class="rv">Keselarasan Tujuan Pembangunan <span style="color:var(--green2)">Berkelanjutan PBB</span></h2>
+  <p class="lead rv">MYSTERO secara langsung berkontribusi pada tiga SDGs paling kritis bagi masa depan planet dan kesehatan manusia.</p>
+
+  <div class="sdg-row">
+    <div class="sdg-card sdg-1 rv">
+      <div class="sdg-num">SDG 3</div>
+      <div class="sdg-title">Kesehatan yang Baik & Sejahtera</div>
+      <div class="sdg-body">Mencegah paparan karsinogen monomer stirena dari styrofoam dan keracunan makanan melalui deteksi dini pembusukan secara visual yang akurat dan dapat diandalkan.</div>
+    </div>
+    <div class="sdg-card sdg-2 rv2">
+      <div class="sdg-num">SDG 12</div>
+      <div class="sdg-title">Konsumsi & Produksi Bertanggung Jawab</div>
+      <div class="sdg-body">Menggantikan plastik abadi dengan alternatif bio-sirkular yang terurai sempurna tanpa meninggalkan jejak toksik, menutup siklus ekonomi sirkular secara nyata.</div>
+    </div>
+    <div class="sdg-card sdg-3 rv3">
+      <div class="sdg-num">SDG 13</div>
+      <div class="sdg-title">Penanganan Perubahan Iklim</div>
+      <div class="sdg-body">Menurunkan jejak karbon industri pengemasan global sekaligus menyerap karbon atmosfer melalui sistem regenerasi tanaman hidup yang terintegrasi.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FAQ ══════════════════════════════════════ -->
+<section id="faq">
+  <div class="sec-tag rv">09 — FAQ Ilmiah</div>
+  <h2 class="rv">Pertanyaan yang <span style="color:var(--blue2)">Sering Diajukan</span></h2>
+  <p class="lead rv">Jawaban berbasis literatur saintifik terverifikasi untuk pertanyaan umum mengenai keamanan dan performa MYSTERO.</p>
+
+  <div class="faq-wrap">
+    <div class="faq-item rv open">
+      <div class="faq-q">
+        <span class="faq-q-text">Apakah sisa jamur pada wadah dapat tumbuh kembali dan mengkontaminasi makanan?</span>
+        <div class="faq-ico">+</div>
+      </div>
+      <div class="faq-body">
+        <div class="faq-inner">
+          Sama sekali tidak. Melalui tahap <strong>inaktivasi termal</strong> (pemanggangan pada suhu 80–90°C selama 120 menit), seluruh sel hifa dan spora jamur telah dimatikan secara permanen. Material komposit sepenuhnya inert, kering, dan memenuhi standar <strong>Food Grade</strong>. Proses ini setara dengan pasteurisasi industri pangan yang telah divalidasi secara global.
+        </div>
+      </div>
+    </div>
+    <div class="faq-item rv">
+      <div class="faq-q">
+        <span class="faq-q-text">Berapa lama waktu paruh degradasi MYSTERO jika dibuang ke tanah?</span>
+        <div class="faq-ico">+</div>
+      </div>
+      <div class="faq-body">
+        <div class="faq-inner">
+          Berbeda drastis dengan polistirena yang membutuhkan lebih dari <strong>500 tahun</strong>, MYSTERO akan mulai melunak dalam <strong>1–2 minggu pertama</strong> di lingkungan tanah lembap, dan terurai sepenuhnya menjadi nutrisi organik dalam kurun waktu <strong>30–45 hari</strong>, selaras dengan masa perkecambahan biji yang dibawanya — menjadikannya benar-benar zero-waste dari siklus awal hingga akhir.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ REFERENSI ══════════════════════════════════════ -->
+<section id="referensi">
+  <div class="sec-tag rv">10 — Daftar Pustaka</div>
+  <h2 class="rv">Referensi <span style="color:var(--blue2)">Ilmiah</span></h2>
+  <p class="lead rv">Seluruh klaim saintifik dalam proyek MYSTERO berlandaskan pada literatur akademis terverifikasi berikut.</p>
+
+  <div class="ref-grid">
+    <div class="ref-item rv">
+      <div class="ref-author">CHU, B. S., DKK. · 2016</div>
+      <div class="ref-title">Anthocyanins as pH-responsive intelligent packaging indicators for fresh food</div>
+      <div class="ref-journal">Food Control — Elsevier</div>
+    </div>
+    <div class="ref-item rv2">
+      <div class="ref-author">HOLT, G. A., DKK. · 2012</div>
+      <div class="ref-title">Fungal Mycelium and Cotton Plant Materials in Sustainable Packaging</div>
+      <div class="ref-journal">Journal of Biobased Materials and Bioenergy, 6(4), 431–439</div>
+    </div>
+    <div class="ref-item rv">
+      <div class="ref-author">MAGDOFF, F. & VAN ES, H. · 2021</div>
+      <div class="ref-title">Building Soils for Better Crops (4th ed.)</div>
+      <div class="ref-journal">Sustainable Agriculture Research and Education (SARE)</div>
+    </div>
+    <div class="ref-item rv2">
+      <div class="ref-author">MARPAUNG, A. M., DKK. · 2015</div>
+      <div class="ref-title">Ekstraksi Antosianin dari Bunga Telang dan Aplikasinya</div>
+      <div class="ref-journal">Jurnal Teknologi dan Industri Pangan — IPB</div>
+    </div>
+    <div class="ref-item rv">
+      <div class="ref-author">RAY, B. & BHUNIA, A. · 2013</div>
+      <div class="ref-title">Fundamental Food Microbiology (5th ed.)</div>
+      <div class="ref-journal">CRC Press — Taylor & Francis Group</div>
+    </div>
+    <div class="ref-item rv2">
+      <div class="ref-author">STAMETS, P. · 2005</div>
+      <div class="ref-title">Mycelium Running: How Mushrooms Can Help Save the World</div>
+      <div class="ref-journal">Ten Speed Press — Random House</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FOOTER ══════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand-name">MYSTERO</div>
+      <div class="footer-tagline">"Dari alam, menjaga makanan, kembali menjadi kehidupan."</div>
+    </div>
+    <div class="footer-copy">© 2026 MYSTERO Project. International Award-Winning Biotech Innovation.<br>All scientific claims are backed by peer-reviewed academic references.</div>
+  </div>
+</footer>
+
+<!-- ═══ JAVASCRIPT ══════════════════════════════════════ -->
+<script>
+// ── INTERSECTION OBSERVER REVEAL ──
+const revealAll = document.querySelectorAll('.rv,.rv2,.rv3,.rvl,.rvs');
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1 });
+revealAll.forEach(el => revealObs.observe(el));
+
+// ── COUNTER ──
+function animateCount(el) {
+  const target = parseFloat(el.dataset.target);
+  const suffix = el.dataset.suffix || '';
+  const isFloat = el.dataset.float === '1';
+  const dur = 2400;
+  const start = performance.now();
+  (function step(now) {
+    const p = Math.min((now - start) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 4);
+    const v = target * ease;
+    el.textContent = (isFloat ? v.toFixed(1) : Math.floor(v)) + suffix;
+    if (p < 1) requestAnimationFrame(step);
+  })(start);
+}
+const cntObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !e.target._counted) {
+      e.target._counted = true;
+      animateCount(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.cnt-val, .hero-stat-val').forEach(el => cntObs.observe(el));
+
+// ── TIMELINE PROGRESS ──
+const fabItems = document.querySelectorAll('.fab-item');
+const fabProg  = document.getElementById('fab-prog');
+const fabObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('lit');
+      const lit = document.querySelectorAll('.fab-item.lit').length;
+      if (fabProg) fabProg.style.height = (lit / fabItems.length * 100) + '%';
+    }
+  });
+}, { threshold: 0.45 });
+fabItems.forEach(el => fabObs.observe(el));
+
+// ── FAQ ──
+document.querySelectorAll('.faq-q').forEach(q => {
+  q.addEventListener('click', () => {
+    const item = q.closest('.faq-item');
+    const isOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+    if (!isOpen) item.classList.add('open');
+  });
+});
+
+// ── NAV SCROLL ──
+window.addEventListener('scroll', () => {
+  document.getElementById('navbar').style.background =
+    window.scrollY > 50 ? 'rgba(6,13,26,0.97)' : 'rgba(6,13,26,0.80)';
+}, { passive: true });
+
+// ── PARALLAX HERO GRID ──
+window.addEventListener('scroll', () => {
+  const g = document.querySelector('.hero-grid');
+  if (g) g.style.transform = `translateY(${window.scrollY * 0.18}px)`;
+}, { passive: true });
+</script>
+</body>
+</html>
